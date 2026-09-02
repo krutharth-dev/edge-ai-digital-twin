@@ -22,17 +22,20 @@ A five-member academic engineering project developing a real-time condition-moni
 
 - [Project Overview](#project-overview)
 - [Planned Capabilities](#planned-capabilities)
+- [Version 1 Scope](#version-1-scope)
 - [System Architecture](#system-architecture)
 - [Hardware](#hardware)
 - [Technology Stack](#technology-stack)
 - [Communication Design](#communication-design)
 - [Why Edge AI?](#why-edge-ai)
 - [Machine-Learning Pipeline](#machine-learning-pipeline)
+- [Dataset and Evaluation Protocol](#dataset-and-evaluation-protocol)
 - [Digital Twin](#digital-twin)
 - [Experimental Conditions](#experimental-conditions)
 - [Repository Structure](#repository-structure)
 - [Development Status](#development-status)
 - [Implementation Roadmap](#implementation-roadmap)
+- [Scope Boundaries](#scope-boundaries)
 - [Safety](#safety)
 - [Team Collaboration](#team-collaboration)
 - [Future Results](#future-results)
@@ -70,6 +73,18 @@ The completed prototype is intended to provide:
 - Synchronized Digital Twin state for the physical motor/fan
 - Live readings, historical trends, predictions, and alerts on a dashboard
 - Maintenance recommendations based on the inferred machine state
+
+## Version 1 Scope
+
+The team will first build the **smallest complete end-to-end system** before expanding the number of sensors, fault classes, or visual features.
+
+| Stage | Sensors and classes | Required outcome |
+|---|---|---|
+| **Core MVP** | Vibration (ADXL345) + current (ACS712); `Normal` versus `Abnormal` | Stable motor-to-dashboard pipeline, labelled data capture, baseline Random Forest inference, and automatic Digital Twin state updates |
+| **Complete prototype** | Add temperature (DS18B20) and RPM (Hall sensor); `Normal`, `Controlled imbalance`, `Increased load / overload`, and `Thermal abnormality` | Synchronized multi-sensor monitoring, validated multi-class inference, health states, trends, alerts, and maintenance messages |
+| **Optional enhancement** | Advanced models, 3D visualization, or public-dataset RUL demonstration | Attempted only after the complete prototype is reliable and validated |
+
+Where practical, RPM should be recorded from the beginning because speed changes can alter vibration and current independently of a fault. However, RPM is not required to block the first vibration-and-current pipeline test.
 
 ## System Architecture
 
@@ -147,8 +162,8 @@ The initial stack has been selected at a technology-family level. Options marked
 | **Edge platform** | Raspberry Pi, Raspberry Pi OS, Python, Mosquitto, Paho MQTT | Local MQTT, processing, inference, and application services |
 | **Data processing** | NumPy, Pandas, SciPy | Signal windows, cleaning, transformation, and feature extraction |
 | **Machine learning** | scikit-learn, Random Forest, Gradient Boosting, Joblib | Initial model training, comparison, serialization, and deployment |
-| **Storage** | InfluxDB, SQLite, or CSV | **Candidate options** for live and historical data storage |
-| **Dashboard / Digital Twin** | Streamlit or Node-RED | **Candidate options** for visualization and operator interaction |
+| **Storage** | CSV initially; SQLite or InfluxDB if required | Begin with the simplest reproducible storage approach and expand only when justified |
+| **Dashboard / Digital Twin** | Streamlit or Node-RED; Grafana optional | Candidate options for visualization and operator interaction |
 | **Future model runtimes** | TensorFlow Lite or ONNX Runtime | Optional evaluation only if later models require them |
 
 Cloud services are not required for the core design: the proposed monitoring and inference path is local to the ESP32–Raspberry Pi system.
@@ -226,6 +241,22 @@ Vibration data will be processed in time windows rather than treated as isolated
 These vibration features can be combined with synchronized **temperature**, **current**, and **RPM** measurements to form the model input vector. The final feature set will be selected through experimental analysis and validation.
 
 To prevent training–deployment mismatch, the same preprocessing and feature definitions used during training will be exported or reproduced on the Raspberry Pi.
+
+## Dataset and Evaluation Protocol
+
+The team will collect its own labelled data through **multiple repeated experimental runs**, rather than treating one long recording as the complete dataset. Each run should retain at least:
+
+- Timestamp and run/session ID
+- Operating class and the method used to create it
+- Motor speed or PWM setting
+- Applied load or imbalance configuration
+- Sensor sampling settings, units, and calibration notes
+- Relevant environmental or hardware changes
+
+> [!WARNING]
+> Training, validation, and test data must be split by **complete experimental runs or sessions**. Randomly distributing adjacent windows from the same recording across training and test sets can leak highly similar samples and produce unrealistically high accuracy.
+
+Evaluation will include **accuracy, macro-F1, per-class precision and recall, confusion matrix, false-alarm behaviour, inference latency, sensor-to-dashboard latency, and Digital Twin state accuracy**. Model performance will be reported together with the data-splitting method and class distribution.
 
 ## Digital Twin
 
@@ -358,24 +389,41 @@ Generated datasets and model artifacts should be handled according to repository
 
 ## Implementation Roadmap
 
-| Stage | Objective | Planned deliverable |
-|---:|---|---|
-| 1 | Finalize scope and architecture | Approved architecture, responsibilities, and interfaces |
-| 2 | Build the physical test rig | Secure motor/fan assembly with safety controls |
-| 3 | Integrate sensors | Calibrated vibration, temperature, current, and RPM acquisition |
-| 4 | Establish IoT communication | Reliable ESP32-to-Raspberry Pi MQTT data flow |
-| 5 | Define experiments and collect data | Labelled normal and controlled abnormal-condition datasets |
-| 6 | Build the ML pipeline | Reproducible preprocessing, features, training, and evaluation |
-| 7 | Deploy Edge AI | Exported model running live inference on the Raspberry Pi |
-| 8 | Implement the Digital Twin | Synchronized `MOTOR_01` state and historical data linkage |
-| 9 | Build dashboard and alerts | Live visualization, health state, and maintenance messages |
-| 10 | Validate the integrated system | Documented experiments, metrics, limitations, and demonstration |
+The agreed implementation order is:
 
+`Freeze scope and architecture → Build safe motor rig → Test sensors individually → Program ESP32 → Establish MQTT communication → Store live data → Collect normal data → Collect controlled abnormal data → Clean/window/extract features → Train and evaluate models → Deploy model on Raspberry Pi → Add health and alert logic → Build Digital Twin backend → Build dashboard → Integrate and validate`
+
+> [!IMPORTANT]
+> The earliest milestone is **physical motor → real sensor values → ESP32 → MQTT → Raspberry Pi → stored/live data**. Major AI optimization and dashboard styling should wait until this pipeline is reliable.
+
+### Eight-Week Core Target
+
+| Week | Primary focus | Target output |
+|---:|---|---|
+| **1–2** | Architecture, components, safe motor rig, and individual sensor tests | Stable physical platform and verified sensor readings |
+| **3** | ESP32 sensor acquisition | Timestamped and structured telemetry from the selected sensors |
+| **4** | MQTT, Raspberry Pi, and storage | Reliable live transmission and stored data |
+| **5** | Normal and controlled-fault data collection | Labelled, repeatable experimental runs with metadata |
+| **6** | Preprocessing, feature extraction, and model training | Evaluated baseline models with run-based splitting |
+| **7** | Raspberry Pi inference and Digital Twin/dashboard | Local live classification, synchronized state, trends, and alerts |
+| **8** | Integration, validation, and demonstration | Repeatable end-to-end demonstration and documented metrics |
+
+Remaining academic time can be used for additional sensors, stronger multi-class performance, improved health scoring, visualization, extended testing, and optional advanced features.
+
+## Scope Boundaries
+
+- The core project is **condition monitoring, anomaly/fault classification, and maintenance warning**.
+- The team will **not claim Remaining Useful Life (RUL)** from a few weeks or months of its own motor data. A separate RUL demonstration may use a suitable public run-to-failure dataset if time permits.
+- The Version 1 Digital Twin does not require a 3D motor model or high-fidelity physics simulation.
+- Cloud processing is not required for the core system; live inference must work locally on the Raspberry Pi.
+- Health scores and maintenance messages are prototype decision-support outputs, not validated industrial safety or maintenance certification.
 ## Safety
 
 Because the testbed contains electrical and rotating components, safety is a design requirement rather than a final-stage addition.
 
 - Mount the motor securely on a stable base
+- Keep motor power separate from the ESP32 and Raspberry Pi power system
+- Never route motor current through a solderless breadboard
 - Fit a transparent guard around all rotating components
 - Secure any experimental imbalance mass against detachment
 - Use fuse protection and a master/emergency power switch
@@ -450,6 +498,10 @@ Results will also document the dataset protocol, train/validation/test strategy,
 The primary end-to-end demonstration goal is:
 
 > **Change the physical motor condition → observe a measurable sensor response → detect the condition locally with Edge AI → update the Digital Twin → generate an appropriate health state or maintenance warning.**
+
+The target demonstration sequence is:
+
+`Normal operation → Live readings → HEALTHY classification → Introduce a safe controlled abnormal condition → Sensor response changes → Edge AI detects the condition → Digital Twin changes automatically → Warning appears → Remove abnormal condition → System returns to normal`
 
 A successful implementation will demonstrate the disciplined integration of **IoT sensing, sensor fusion, Edge AI, predictive-maintenance logic, and Digital Twin technology** in one functioning academic prototype.
 
