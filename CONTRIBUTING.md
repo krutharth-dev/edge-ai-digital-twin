@@ -1,41 +1,87 @@
 # Contributing to Edge-AI Digital Twin
 
-Thank you for your interest in improving this project. Contributions to the documentation, system design, firmware, data pipeline, machine-learning workflow, dashboard, and testing are welcome.
+This repository supports a five-member academic project building a low-cost rotating-machine condition-monitoring prototype. Contributions should move the project toward a reliable end-to-end path:
+
+`Motor/fan → Sensors → ESP32 → MQTT → Raspberry Pi → Preprocessing/features → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
+
+Do not describe planned work as implemented or report estimated results as measurements.
 
 ## Before You Start
 
-- Search existing issues and pull requests to avoid duplicate work.
-- Open an issue before a substantial change so the approach can be discussed.
-- Use the security policy for vulnerabilities; do not report them publicly.
-- Keep claims accurate: features that have not been implemented or validated must be described as planned work.
+- Read the README and the documents in `docs/`.
+- Search existing issues and pull requests.
+- Open or claim an issue before a substantial change.
+- Keep optional 3D, deep-learning, cloud, or RUL work behind the core pipeline.
+- Use the security policy for vulnerabilities; never disclose credentials publicly.
+- Confirm the safety plan before changing hardware or abnormal-condition experiments.
 
-## Development Workflow
+## Branch and Pull-Request Workflow
 
-1. Fork the repository and create a focused branch from `main`.
-2. Make one logically related change at a time.
-3. Follow the architecture, naming, and setup guidance in the README.
-4. Add or update documentation and tests relevant to your change.
-5. Commit with a short, descriptive message.
-6. Open a pull request and complete the checklist.
+1. Create a focused branch from the current `main`.
+2. Use a descriptive name such as `feature/esp32-adxl345`, `feature/mqtt-ingestion`, `feature/run-split-training`, or `docs/data-protocol`.
+3. Make one logically related change at a time.
+4. Add or update tests, interface documentation, and configuration examples.
+5. Commit using a clear conventional prefix such as `feat:`, `fix:`, `docs:`, `test:`, or `chore:`.
+6. Push the branch and open a reviewed pull request.
+7. Do not merge until affected interfaces and validation evidence are recorded.
 
-## Project Guidelines
+## Architecture Rules
 
-- Separate ESP32 firmware, Raspberry Pi services, model-training code, dashboard code, and documentation clearly.
-- Never commit credentials, Wi-Fi passwords, API keys, raw personal data, or generated secrets.
-- Document hardware assumptions, pin assignments, units, sampling rates, dependencies, and reproducible setup steps.
-- For machine-learning changes, describe the dataset, preprocessing, evaluation method, metrics, and limitations.
-- Treat alert thresholds and maintenance recommendations as prototype outputs unless they have been validated.
-- Follow electrical and rotating-equipment safety guidance in the README.
+- The ESP32 owns sensor acquisition, basic validation/timestamping, telemetry packaging, Wi-Fi, and MQTT publishing.
+- The Raspberry Pi owns storage, signal preprocessing, feature extraction, live inference, health logic, Digital Twin state, dashboard services, and alerts.
+- The core live path must operate locally without cloud inference.
+- Training may run on a development laptop, but exported preprocessing and feature definitions must match Raspberry Pi inference.
+- Version 1 uses an operational Digital Twin; a 3D model is optional.
+- The project does not claim Remaining Useful Life from its short-duration experimental dataset.
 
-## Pull Request Checklist
+Any change to these boundaries requires a documented architecture decision and team review.
 
-Before submitting, confirm that:
+## Interface Requirements
 
-- The change is scoped and clearly explained.
-- Relevant code, documentation, diagrams, and configuration agree with one another.
-- Tests or manual validation steps are included.
-- No generated build artefacts, secrets, or unrelated files are committed.
-- New dependencies are necessary and documented.
-- The change follows the Code of Conduct.
+Document every changed:
 
-By contributing, you agree that your contribution is licensed under the repository's MIT License.
+- Sensor pin, calibration method, unit, sampling rate, and valid range
+- MQTT topic, payload field, schema version, QoS, retained-message behaviour, and publisher
+- CSV/database column, data type, label, timestamp convention, and missing-value rule
+- Feature name, window definition, preprocessing step, and expected unit
+- Digital Twin field, state transition, health rule, and alert condition
+- Configuration key, default, and secret-handling requirement
+
+## Data and Machine-Learning Requirements
+
+- Collect repeated independent runs with run IDs and experimental metadata.
+- Preserve raw data as immutable local evidence; derived data must be reproducible.
+- Split training, validation, and test sets by complete runs or sessions.
+- Never place adjacent windows from the same run in both training and test data.
+- Report class distribution, split method, accuracy, macro-F1, per-class precision/recall, confusion matrix, false alarms, and latency where applicable.
+- Compare the Random Forest baseline before adding a more complex model.
+- Store model metadata with the artifact: feature order, preprocessing version, labels, training commit, and dataset/run manifest.
+- Never fabricate performance, hardware behaviour, or validation outcomes.
+
+## Code and Documentation Quality
+
+- Keep modules small and responsibilities explicit.
+- Prefer configuration over hard-coded hostnames, credentials, units, labels, or thresholds.
+- Use SI units in stored and transmitted data unless a documented reason requires otherwise.
+- Include useful error messages and safe failure behaviour.
+- Add unit tests for deterministic processing and contract tests for schemas.
+- Update the README and relevant module documentation when behaviour changes.
+
+## Hardware and Experimental Safety
+
+- Keep motor power separate from ESP32 and Raspberry Pi power.
+- Never route motor current through a solderless breadboard.
+- Use a stable mount, rotating guard, fuse, master/emergency switch, insulated connections, and strain relief.
+- Secure any imbalance mass and operate within rated electrical, mechanical, and thermal limits.
+- Define stop conditions before each run and stop immediately for instability, excessive heat/current/vibration, loose hardware, or unexpected noise.
+- Do not perform destructive fault injection.
+
+## Files That Must Not Be Committed
+
+- Wi-Fi or MQTT credentials, tokens, keys, or private configuration
+- Raw/full datasets unless the team approves a small public example
+- Trained model binaries without an explicit artifact policy
+- Local databases, logs, cache directories, virtual environments, and generated reports
+- Personal data, sensitive images, or third-party material without permission
+
+By contributing, you agree to follow the Code of Conduct and license your contribution under the repository's MIT License.

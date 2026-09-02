@@ -1,5 +1,5 @@
-name: Feature request
-description: Suggest an improvement or new capability
+name: Project improvement
+description: Propose a scoped improvement to the agreed Edge-AI Digital Twin design
 title: "[Feature]: "
 labels:
   - enhancement
@@ -10,23 +10,56 @@ body:
       options:
         - label: I searched existing issues and did not find a similar request.
           required: true
+        - label: I checked the README scope boundaries and architecture decisions.
+          required: true
+  - type: dropdown
+    attributes:
+      label: Affected area
+      options:
+        - Motor rig or safety
+        - Sensor or ESP32 firmware
+        - MQTT or Raspberry Pi services
+        - Data collection or storage
+        - Feature engineering or machine learning
+        - Digital Twin or health logic
+        - Dashboard or alerts
+        - Testing, documentation, or developer tooling
+        - Optional post-MVP enhancement
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Problem or opportunity
-      description: What need would this address, and who would benefit?
+      description: What verified project need would this address?
     validations:
       required: true
   - type: textarea
     attributes:
       label: Proposed solution
-      description: Describe the desired behaviour and, if useful, a possible implementation.
+      description: Describe the desired behaviour, interfaces affected, and the smallest useful implementation.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Success criteria
+      description: Explain how the team can objectively test whether this change works.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Architecture, data, and safety impact
+      description: Note changes to MQTT payloads, data schemas, model features, physical experiments, dependencies, or dashboard state.
+  - type: textarea
+    attributes:
+      label: Scope and timing
+      description: State whether this is required for the core MVP, complete prototype, or only after the end-to-end pipeline is stable.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Alternatives considered
-      description: Describe any workarounds or alternative approaches.
+      description: Describe simpler approaches or workarounds.
   - type: textarea
     attributes:
       label: Additional context
-      description: Add diagrams, examples, references, or screenshots if helpful.
+      description: Add diagrams, references, examples, or screenshots if helpful. Do not report unverified performance as fact.

@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+secrets.*
+*.pem
+*.key
+
+# Data, databases, logs, and generated artifacts
+data/raw/*
+!data/raw/README.md
+data/processed/*
+!data/processed/README.md
+ai/models/*
+!ai/models/README.md
+*.csv
+*.parquet
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.joblib
+*.pkl
+*.onnx
+*.tflite
+
+# Notebooks and reports
+.ipynb_checkpoints/
+reports/generated/
+
+# PlatformIO, editors, and operating systems
+.pio/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build output
+build/
+dist/

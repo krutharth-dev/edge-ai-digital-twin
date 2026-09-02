@@ -1,0 +1,56 @@
+name: Experiment plan or record
+description: Plan or document a safe, reproducible motor/sensor experiment
+title: "[Experiment]: "
+labels:
+  - experiment
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form before or after a controlled run. Do not include credentials, large raw datasets, or fabricated measurements.
+  - type: input
+    attributes:
+      label: Objective
+      description: State the single question this experiment should answer.
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Operating class
+      options:
+        - Normal
+        - Controlled imbalance
+        - Increased load / overload
+        - Thermal abnormality
+        - Sensor calibration or communication test
+        - Other non-destructive test
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Hardware and configuration
+      description: Record hardware revision, sensors, motor/PWM setting, load or imbalance setup, firmware commit, sampling rates, units, and run IDs.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Safety controls and stop conditions
+      description: Identify guard, mounting, power separation, fuse/switch, rated limits, supervision, and explicit stop conditions.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Procedure
+      description: Provide a safe, repeatable sequence without destructive fault injection.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected evidence
+      description: List files, plots, telemetry checks, metrics, or observations that will answer the objective.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Result and limitations
+      description: Complete after the run. Separate measured results from interpretation and record invalid/interrupted runs honestly.

@@ -21,6 +21,7 @@ A five-member academic engineering project developing a real-time condition-moni
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Project Documentation](#project-documentation)
 - [Planned Capabilities](#planned-capabilities)
 - [Version 1 Scope](#version-1-scope)
 - [System Architecture](#system-architecture)
@@ -59,6 +60,18 @@ The project integrates four distinct layers:
 **Core flow**
 
 `Physical motor/fan → Sensors → ESP32 → Wi-Fi/MQTT → Raspberry Pi → Preprocessing → Feature extraction → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
+
+## Project Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) — component responsibilities, data flow, deployment boundaries, and system invariants
+- [Architecture Decisions](docs/DECISIONS.md) — accepted scope and design choices that should not drift without team review
+- [MQTT Contract](docs/MQTT_CONTRACT.md) — proposed topics, payload envelopes, ownership, QoS, and reconnect behaviour
+- [Data-Collection Protocol](docs/DATA_COLLECTION_PROTOCOL.md) — repeatable runs, labels, metadata, storage, and leakage-safe splitting
+- [Test Plan](docs/TEST_PLAN.md) — sensor, IoT, ML, Digital Twin, dashboard, latency, and end-to-end validation
+- [Eight-Week Roadmap](docs/ROADMAP.md) — weekly deliverables, exit criteria, dependencies, and definition of done
+- [Safety Plan](docs/SAFETY.md) — electrical, mechanical, thermal, experimental, and emergency controls
+
+Module-specific guidance is available in the `esp32`, `raspberry-pi`, `ai`, `digital-twin`, `dashboard`, `data`, and `tests` directories. These files describe the agreed interfaces and implementation order; they do not claim that the corresponding software has already been completed.
 
 ## Planned Capabilities
 
@@ -315,41 +328,27 @@ Data collection will require consistent labels, timestamps, units, sampling sett
 
 ## Repository Structure
 
-The repository is planned to evolve toward the following modular structure:
+The repository now provides a documented scaffold for the planned implementation:
 
 ```text
 edge-ai-digital-twin/
-├── README.md
-├── LICENSE
-├── requirements.txt
+├── .github/                    # Issue and pull-request templates
+├── ai/                         # Feature engineering, model training, and artifacts
+├── dashboard/                  # Planned operator dashboard
+├── data/                       # Dataset rules and local raw/processed folders
+├── digital-twin/               # Asset-state and health-logic design
+├── docs/                       # Architecture, protocols, roadmap, tests, and safety
+├── esp32/                      # Sensor-node firmware guidance
+├── raspberry-pi/               # Edge-service guidance
+├── tests/                      # Validation strategy
+├── .env.example                # Non-secret configuration template
 ├── .gitignore
-├── esp32/
-│   ├── firmware/
-│   └── sensor-tests/
-├── raspberry-pi/
-│   ├── mqtt/
-│   ├── preprocessing/
-│   ├── inference/
-│   └── health-monitoring/
-├── ai/
-│   ├── notebooks/
-│   ├── feature-extraction/
-│   ├── training/
-│   └── models/
-├── digital-twin/
-├── dashboard/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── docs/
-│   ├── architecture/
-│   ├── diagrams/
-│   └── reports/
-└── tests/
+├── requirements.txt            # Initial Python runtime dependencies
+├── requirements-dev.txt        # Development and test dependencies
+└── README.md
 ```
 
-Generated datasets and model artifacts should be handled according to repository size and privacy requirements; large or derived files should not be committed without an agreed team policy.
-
+Implementation code will be added progressively inside these modules. Raw datasets, trained-model binaries, credentials, local databases, logs, and generated outputs are excluded from Git unless the team explicitly approves a small reproducible example.
 ## Development Status
 
 ### Research and Design
@@ -360,6 +359,7 @@ Generated datasets and model artifacts should be handled according to repository
 - [x] Define the Digital Twin concept
 - [x] Select the primary sensors and processing hardware
 - [x] Identify the initial software stack and ML approach
+- [x] Document architecture decisions, MQTT contract, dataset protocol, test plan, roadmap, and safety controls
 
 ### Hardware and IoT
 

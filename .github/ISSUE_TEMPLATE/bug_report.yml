@@ -1,5 +1,5 @@
-name: Bug report
-description: Report a reproducible problem
+name: Project bug report
+description: Report a reproducible hardware, firmware, data, ML, edge-service, Digital Twin, or dashboard problem
 title: "[Bug]: "
 labels:
   - bug
@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve this project. Please remove secrets and personal data before submitting.
+        Thanks for helping improve the Edge-AI Digital Twin project. Remove Wi-Fi credentials, broker passwords, private data, and unsafe experimental details before submitting.
   - type: checkboxes
     attributes:
       label: Before submitting
@@ -16,20 +16,53 @@ body:
           required: true
         - label: I am not reporting a security vulnerability.
           required: true
+        - label: If physical hardware was involved, the test was stopped and made safe before I investigated.
+          required: true
+  - type: dropdown
+    attributes:
+      label: Affected area
+      options:
+        - Motor rig or electrical system
+        - Sensor or ESP32 firmware
+        - Wi-Fi or MQTT communication
+        - Raspberry Pi edge service
+        - Data collection or storage
+        - Feature extraction or machine learning
+        - Digital Twin or health logic
+        - Dashboard or alerts
+        - Documentation or tooling
+        - End-to-end integration
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Project stage
+      options:
+        - Design or setup
+        - Individual sensor testing
+        - MQTT pipeline
+        - Dataset collection
+        - Offline model training
+        - Live edge inference
+        - Digital Twin or dashboard
+        - Integrated demonstration
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Problem
-      description: What happened?
+      description: What happened, and what part of the expected data or control flow was affected?
     validations:
       required: true
   - type: textarea
     attributes:
       label: Steps to reproduce
-      description: Provide the smallest reliable sequence that demonstrates the problem.
+      description: Provide the smallest safe and reliable sequence that demonstrates the problem.
       placeholder: |
-        1. Configure ...
-        2. Run ...
-        3. Observe ...
+        1. Hardware and software state ...
+        2. Configuration or operating condition ...
+        3. Command or action ...
+        4. Observed result ...
     validations:
       required: true
   - type: textarea
@@ -39,10 +72,18 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Environment
-      description: Include relevant OS, hardware, runtime, dependency, browser, or firmware details.
+      label: Environment and hardware
+      description: Include OS, branch/commit, ESP32 board, Raspberry Pi model, sensor, motor supply, firmware/tool versions, and relevant sampling settings.
+  - type: textarea
+    attributes:
+      label: Telemetry or dataset context
+      description: Include asset ID, run ID, timestamps, topic names, units, labels, and sample rates where relevant. Do not upload large raw datasets.
+  - type: textarea
+    attributes:
+      label: Validation already attempted
+      description: State the sensor test, MQTT check, unit test, or safe manual check already performed.
   - type: textarea
     attributes:
       label: Logs or screenshots
-      description: Paste relevant output after removing secrets and personal information.
+      description: Paste only the relevant output after removing secrets and personal information.
       render: shell

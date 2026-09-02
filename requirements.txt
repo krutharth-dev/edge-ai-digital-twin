@@ -1,0 +1,11 @@
+# Initial Raspberry Pi, data, ML, and dashboard stack.
+# Freeze exact working versions after the first validated Raspberry Pi setup.
+paho-mqtt
+python-dotenv
+numpy
+pandas
+scipy
+scikit-learn
+joblib
+matplotlib
+streamlit
