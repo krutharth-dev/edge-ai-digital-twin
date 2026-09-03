@@ -472,7 +472,7 @@ Each pull request should describe the change, its test evidence, any affected in
 
 | Team member | GitHub | Primary responsibilities |
 |---|---|---|
-| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Overall system architecture; Digital Twin design and backend; Edge-AI methodology, training and evaluation; health and alert logic; cross-module integration; technical validation and final demonstration |
+| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Overall system architecture; Digital Twin design and backend; Edge-AI methodology, training and evaluation; health and alert logic; cross-module integration; cross-functional coordination; technical guidance; interface and pull-request review; resolution of integration blockers; technical validation and final demonstration |
 | **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | Raspberry Pi setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging |
 | **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor power-system planning; fuse and emergency controls; physical safety; sensor wiring and mounting; calibration; controlled-condition setup and hardware test evidence |
 | **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | ESP32 sensor acquisition; telemetry formatting; Wi-Fi and MQTT publishing; run identification; labelled data collection; data-quality checking and communication tests |
@@ -480,7 +480,7 @@ Each pull request should describe the change, its test evidence, any affected in
 
 #### Responsibility Overview
 
-- **Krutharth:** Defines the overall system architecture and Digital Twin design, develops the Edge-AI training and evaluation approach, establishes health and alert logic, brings the project modules together, and coordinates technical validation and the final demonstration.
+- **Krutharth:** Defines the overall system architecture and Digital Twin design, develops the Edge-AI training and evaluation approach, establishes health and alert logic, brings the project modules together, and coordinates technical validation and the final demonstration. He also facilitates cross-functional collaboration, reviews interfaces and deliverables, shares implementation guidance, and works with team members to resolve technical and integration blockers across the project.
 - **KISHAN-B-GOWDA:** Configures and develops the Raspberry Pi environment, implements MQTT ingestion and local storage, builds the preprocessing and feature-extraction flow, deploys the selected Edge-AI model, connects Digital Twin services, and investigates integration problems.
 - **kavanasomesh-spec:** Plans and assembles the motor power system, fuse and emergency controls, applies the physical safety requirements, mounts and wires the sensors, performs calibration, prepares controlled operating conditions, and records hardware test evidence.
 - **manyavasu2006:** Develops ESP32 sensor acquisition, structures telemetry with timestamps and run identification, implements Wi-Fi and MQTT publishing, participates in labelled data collection, checks data quality, and tests communication behaviour.
