@@ -472,11 +472,23 @@ Each pull request should describe the change, its test evidence, any affected in
 
 | Team member | GitHub | Primary responsibility | Current status |
 |---|---|---|---|
-| **Krutharth — Project Lead** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Initial repository setup, project architecture, coordination, documentation consistency and final system integration | Active — primary-stage setup |
+| **Krutharth — Project Lead** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Project leadership, architecture, repository management, motor/power and safety review, cross-team technical support, pull-request review, integration, validation, documentation and final demonstration | Active — primary-stage setup and cross-team contribution |
 | **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | ESP32 sensor acquisition, telemetry formatting, Wi-Fi and MQTT publishing | Assigned — implementation pending |
 | **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor rig, power system, physical safety and sensor integration | Assigned — implementation pending |
 | **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | Raspberry Pi ingestion/storage, feature engineering, model training and local Edge-AI deployment | Assigned — implementation pending |
 | **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Digital Twin state, health/alert logic, dashboard and integrated testing | Assigned — implementation pending |
+
+#### Project Lead Cross-Team Responsibilities
+
+As project head, Krutharth will contribute to and review every major workstream while each assigned member remains responsible for implementing and documenting their primary module:
+
+- **With KISHAN-B-GOWDA:** review sensor interfaces, ESP32 acquisition structure, timestamps/quality flags, MQTT topics and payload compatibility.
+- **With kavanasomesh-spec:** help select and assemble the motor rig, power supply, fuse and emergency switch; review electrical separation, guarding, sensor mounting and experimental safety.
+- **With manyavasu2006:** support Raspberry Pi setup, telemetry storage, preprocessing/feature definitions, run-based dataset splitting, model evaluation and edge deployment checks.
+- **With monishasm32-lab:** help define Digital Twin fields, health/alert rules, dashboard requirements, stale-data behaviour and integrated validation.
+- **Across the whole team:** maintain architecture consistency, coordinate interfaces and milestones, review pull requests, track issues, resolve integration problems, verify evidence, and coordinate the final report, presentation and demonstration.
+
+These are assigned ongoing project-lead responsibilities, not claims that the implementation or validation has already been completed.
 
 These are the team's initial ownership areas and may overlap during integration. Each member should work from their own GitHub account and use their own branch, commits and pull requests so the repository records their actual contributions. The GitHub usernames above identify the current collaborators. Full names can be added later if each member wants them displayed.
 
