@@ -476,7 +476,7 @@ Each pull request should describe the change, its test evidence, any affected in
 | **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | **Advanced technical core** | Raspberry Pi setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging | Assigned — advanced implementation pending |
 | **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | **Core implementation** | Motor power-system planning, fuse/emergency controls, physical safety, sensor wiring and mounting, calibration, controlled-condition setup and hardware test evidence | Assigned — moderate hardware work pending |
 | **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | **Core implementation** | ESP32 sensor acquisition, telemetry formatting, Wi-Fi/MQTT publishing, run identification, labelled data collection, data-quality checking and communication tests | Assigned — moderate firmware/data work pending |
-| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | **Prototype and project support** | Component inventory and bill of materials; basic motor/fan rig assembly under supervision; experiment logs; photographs/video evidence; progress documentation; presentation and demonstration support | Assigned — foundational support work pending |
+| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | **Applied implementation** | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation support | Assigned — medium-complexity applied work pending |
 
 #### Advanced Technical Core — Krutharth and Kishan
 
@@ -497,9 +497,9 @@ They should divide this joint work into separate issues, branches and pull reque
 
 Kavana and Manyavasu own moderate-complexity work that supplies reliable hardware and telemetry to the advanced technical core. Their tasks include safe sensor integration, ESP32 acquisition, MQTT publishing, calibration, controlled data collection and evidence gathering. Interface changes should be reviewed with Krutharth and Kishan before dataset collection begins.
 
-#### Prototype and Project Support — Monisha
+#### Applied Implementation — Monisha
 
-Monisha owns accessible but meaningful setup and project-support work. Basic mechanical assembly must be supervised, and power wiring, rotating imbalance tests and safety-critical modifications require review by the hardware and integration owners. This role can expand into dashboard content or additional testing when resources and availability permit.
+Monisha owns a medium-complexity applied role. She will build the initial dashboard interface after the data contract is available, display live values with units and timestamps, create historical sensor graphs, present Digital Twin health and alert states, review CSV outputs, and test disconnected, stale and invalid-data behaviour. She will document the dashboard setup and support the final presentation. Backend Edge-AI and Digital Twin logic remain with Krutharth and Kishan, who will provide and review the required interfaces.
 
 These are assigned responsibilities, not claims that implementation or validation has already been completed.
 
