@@ -486,7 +486,7 @@ Each pull request should describe the change, its test evidence, any affected in
 - **manyavasu2006:** Develops ESP32 sensor acquisition, structures telemetry with timestamps and run identification, implements Wi-Fi and MQTT publishing, participates in labelled data collection, checks data quality, and tests communication behaviour.
 - **monishasm32-lab:** Creates the Streamlit or Node-RED dashboard, presents live readings and historical graphs, displays health and alert states, reviews CSV outputs, connects the Digital Twin state to the interface, performs interface testing, and documents the dashboard and presentation workflow.
 
-Responsibilities identify the team's current areas of ownership without ranking their importance or difficulty. Members may collaborate across modules as needed. Each member should use their own branches, commits and pull requests so the repository accurately records their contributions.
+The responsibilities above identify the team's current areas of ownership. Members may collaborate across modules as needed. Each member should use their own branches, commits and pull requests so the repository accurately records their contributions.
 
 ## Future Results
 
