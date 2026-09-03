@@ -473,12 +473,12 @@ Each pull request should describe the change, its test evidence, any affected in
 | Team member | GitHub | Primary responsibility | Current status |
 |---|---|---|---|
 | **Krutharth — Project Lead** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Initial repository setup, project architecture, coordination, documentation consistency and final system integration | Active — primary-stage setup |
-| **Member 2** | `@username` | Motor rig, power system, physical safety and sensor integration | Assigned — implementation pending |
-| **Member 3** | `@username` | ESP32 sensor acquisition, telemetry formatting, Wi-Fi and MQTT publishing | Assigned — implementation pending |
-| **Member 4** | `@username` | Raspberry Pi ingestion/storage, feature engineering, model training and local Edge-AI deployment | Assigned — implementation pending |
-| **Member 5** | `@username` | Digital Twin state, health/alert logic, dashboard and integrated testing | Assigned — implementation pending |
+| **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor rig, power system, physical safety and sensor integration | Assigned — implementation pending |
+| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | ESP32 sensor acquisition, telemetry formatting, Wi-Fi and MQTT publishing | Assigned — implementation pending |
+| **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | Raspberry Pi ingestion/storage, feature engineering, model training and local Edge-AI deployment | Assigned — implementation pending |
+| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Digital Twin state, health/alert logic, dashboard and integrated testing | Assigned — implementation pending |
 
-These are the team's initial ownership areas and may overlap during integration. Each member should work from their own GitHub account and use their own branch, commits and pull requests so the repository records their actual contributions. Replace each placeholder only with the member's confirmed name and GitHub username.
+These are the team's initial ownership areas and may overlap during integration. Each member should work from their own GitHub account and use their own branch, commits and pull requests so the repository records their actual contributions. The GitHub usernames above identify the current collaborators. Full names can be added later if each member wants them displayed.
 
 ## Future Results
 
