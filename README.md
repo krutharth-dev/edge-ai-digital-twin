@@ -472,25 +472,30 @@ Each pull request should describe the change, its test evidence, any affected in
 
 | Team member | GitHub | Primary responsibility | Current status |
 |---|---|---|---|
-| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Architecture, repository management, motor/power and safety review, cross-team technical support, pull-request review, integration, validation, documentation and final demonstration | Active — primary-stage setup and cross-team contribution |
-| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | ESP32 sensor acquisition, telemetry formatting, Wi-Fi and MQTT publishing | Assigned — implementation pending |
-| **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor rig, power system, physical safety and sensor integration | Assigned — implementation pending |
-| **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | Raspberry Pi ingestion/storage, feature engineering, model training and local Edge-AI deployment | Assigned — implementation pending |
-| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Digital Twin state, health/alert logic, dashboard and integrated testing | Assigned — implementation pending |
+| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Overall system architecture; Raspberry Pi edge-platform design; feature engineering; Edge-AI model training, evaluation and deployment; Digital Twin architecture/backend; end-to-end integration and validation | Active — advanced technical core and integration |
+| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | ESP32/MQTT interface design; Raspberry Pi ingestion and preprocessing; Edge-AI training/deployment; Digital Twin backend and health logic; end-to-end technical integration | Assigned — advanced technical core and integration |
+| **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor rig, power system, fuse/emergency controls, physical safety, sensor mounting, calibration and controlled-condition setup | Assigned — hardware implementation pending |
+| **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | Dataset collection and storage, run metadata, labelling, data-quality checks, preprocessing support and experimental test execution | Assigned — data and validation work pending |
+| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Dashboard interface, live graphs, alert/maintenance presentation, event history, documentation support and user-facing validation | Assigned — dashboard and documentation work pending |
 
-#### Krutharth's Cross-Team Responsibilities
+#### Advanced Technical Workstream — Krutharth and Kishan
 
-Krutharth will contribute to and review every major workstream while each assigned member remains responsible for implementing and documenting their primary module:
+Krutharth and Kishan jointly own the most technically complex integration path:
 
-- **With KISHAN-B-GOWDA:** review sensor interfaces, ESP32 acquisition structure, timestamps/quality flags, MQTT topics and payload compatibility.
-- **With kavanasomesh-spec:** help select and assemble the motor rig, power supply, fuse and emergency switch; review electrical separation, guarding, sensor mounting and experimental safety.
-- **With manyavasu2006:** support Raspberry Pi setup, telemetry storage, preprocessing/feature definitions, run-based dataset splitting, model evaluation and edge deployment checks.
-- **With monishasm32-lab:** help define Digital Twin fields, health/alert rules, dashboard requirements, stale-data behaviour and integrated validation.
-- **Across the whole team:** maintain architecture consistency, coordinate interfaces and milestones, review pull requests, track issues, resolve integration problems, verify evidence, and coordinate the final report, presentation and demonstration.
+- Design the complete ESP32–MQTT–Raspberry Pi interface and resolve cross-module compatibility.
+- Build the Raspberry Pi ingestion, storage, signal-processing, feature-extraction and live-inference pipeline.
+- Prepare leakage-safe datasets and train, compare and evaluate the Random Forest baseline and justified alternatives.
+- Export and deploy the selected preprocessing and Edge-AI model pipeline on the Raspberry Pi.
+- Design and implement the `MOTOR_01` Digital Twin state, data-quality handling, health logic, alerts and history.
+- Integrate physical telemetry, Edge-AI output, Digital Twin state and dashboard behaviour.
+- Test reconnects, stale/invalid data, model/schema incompatibility, recovery and end-to-end latency.
+- Coordinate final integration, measured validation, demonstration evidence and technical explanation.
 
-These are assigned ongoing cross-team responsibilities, not claims that the implementation or validation has already been completed.
+Both contributors should use their own branches and commits. Joint work should be divided into reviewable tasks and pull requests so each person's real contribution remains visible.
 
-These are the team's initial ownership areas and may overlap during integration. Each member should work from their own GitHub account and use their own branch, commits and pull requests so the repository records their actual contributions. The GitHub usernames above identify the current collaborators. Full names can be added later if each member wants them displayed.
+#### Collaboration Across the Team
+
+The allocation defines primary ownership rather than rigid boundaries. Krutharth and Kishan will support the other members with interfaces and integration; hardware, data and dashboard owners will provide the validated inputs and outputs required by the advanced technical workstream. These are assigned responsibilities, not claims that implementation or validation has already been completed.
 
 ## Future Results
 
