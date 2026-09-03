@@ -478,6 +478,14 @@ Each pull request should describe the change, its test evidence, any affected in
 | **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | ESP32 sensor acquisition; telemetry formatting; Wi-Fi and MQTT publishing; run identification; labelled data collection; data-quality checking and communication tests |
 | **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation work |
 
+#### Responsibility Overview
+
+- **Krutharth:** Defines the overall system architecture and Digital Twin design, develops the Edge-AI training and evaluation approach, establishes health and alert logic, brings the project modules together, and coordinates technical validation and the final demonstration.
+- **KISHAN-B-GOWDA:** Configures and develops the Raspberry Pi environment, implements MQTT ingestion and local storage, builds the preprocessing and feature-extraction flow, deploys the selected Edge-AI model, connects Digital Twin services, and investigates integration problems.
+- **kavanasomesh-spec:** Plans and assembles the motor power system, fuse and emergency controls, applies the physical safety requirements, mounts and wires the sensors, performs calibration, prepares controlled operating conditions, and records hardware test evidence.
+- **manyavasu2006:** Develops ESP32 sensor acquisition, structures telemetry with timestamps and run identification, implements Wi-Fi and MQTT publishing, participates in labelled data collection, checks data quality, and tests communication behaviour.
+- **monishasm32-lab:** Creates the Streamlit or Node-RED dashboard, presents live readings and historical graphs, displays health and alert states, reviews CSV outputs, connects the Digital Twin state to the interface, performs interface testing, and documents the dashboard and presentation workflow.
+
 Responsibilities identify the team's current areas of ownership without ranking their importance or difficulty. Members may collaborate across modules as needed. Each member should use their own branches, commits and pull requests so the repository accurately records their contributions.
 
 ## Future Results
