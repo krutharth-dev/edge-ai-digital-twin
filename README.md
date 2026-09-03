@@ -468,15 +468,17 @@ test: validate MQTT communication
 
 Each pull request should describe the change, its test evidence, any affected interfaces or MQTT topics, and any follow-up work. Git history and pull-request reviews will provide a transparent record of individual contributions.
 
-### Contributors
+### Team Responsibilities and Contributors
 
-| Contributor | Primary responsibility | GitHub |
-|---|---|---|
-| Member 1 | To be assigned | `@username` |
-| Member 2 | To be assigned | `@username` |
-| Member 3 | To be assigned | `@username` |
-| Member 4 | To be assigned | `@username` |
-| Member 5 | To be assigned | `@username` |
+| Team member | GitHub | Primary responsibility | Current status |
+|---|---|---|---|
+| **Krutharth — Project Lead** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Initial repository setup, project architecture, coordination, documentation consistency and final system integration | Active — primary-stage setup |
+| **Member 2** | `@username` | Motor rig, power system, physical safety and sensor integration | Assigned — implementation pending |
+| **Member 3** | `@username` | ESP32 sensor acquisition, telemetry formatting, Wi-Fi and MQTT publishing | Assigned — implementation pending |
+| **Member 4** | `@username` | Raspberry Pi ingestion/storage, feature engineering, model training and local Edge-AI deployment | Assigned — implementation pending |
+| **Member 5** | `@username` | Digital Twin state, health/alert logic, dashboard and integrated testing | Assigned — implementation pending |
+
+These are the team's initial ownership areas and may overlap during integration. Each member should work from their own GitHub account and use their own branch, commits and pull requests so the repository records their actual contributions. Replace each placeholder only with the member's confirmed name and GitHub username.
 
 ## Future Results
 
