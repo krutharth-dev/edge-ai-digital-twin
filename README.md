@@ -470,38 +470,15 @@ Each pull request should describe the change, its test evidence, any affected in
 
 ### Team Responsibilities and Contributors
 
-| Team member | GitHub | Workstream | Primary responsibilities | Current status |
-|---|---|---|---|---|
-| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | **Advanced technical core** | Overall system architecture; Digital Twin design and backend; Edge-AI methodology, training and evaluation; health/alert logic; cross-module integration; technical validation and final demonstration | Active — advanced design and integration |
-| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | **Advanced technical core** | Raspberry Pi setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging | Assigned — advanced implementation pending |
-| **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | **Core implementation** | Motor power-system planning, fuse/emergency controls, physical safety, sensor wiring and mounting, calibration, controlled-condition setup and hardware test evidence | Assigned — moderate hardware work pending |
-| **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | **Core implementation** | ESP32 sensor acquisition, telemetry formatting, Wi-Fi/MQTT publishing, run identification, labelled data collection, data-quality checking and communication tests | Assigned — moderate firmware/data work pending |
-| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | **Applied implementation** | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation support | Assigned — medium-complexity applied work pending |
+| Team member | GitHub | Primary responsibilities |
+|---|---|---|
+| **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Overall system architecture; Digital Twin design and backend; Edge-AI methodology, training and evaluation; health and alert logic; cross-module integration; technical validation and final demonstration |
+| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | Raspberry Pi setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging |
+| **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor power-system planning; fuse and emergency controls; physical safety; sensor wiring and mounting; calibration; controlled-condition setup and hardware test evidence |
+| **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | ESP32 sensor acquisition; telemetry formatting; Wi-Fi and MQTT publishing; run identification; labelled data collection; data-quality checking and communication tests |
+| **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation work |
 
-#### Advanced Technical Core — Krutharth and Kishan
-
-Krutharth and Kishan jointly own the most technically complex path:
-
-- Define the end-to-end ESP32–MQTT–Raspberry Pi–Edge AI–Digital Twin architecture.
-- Build the Raspberry Pi ingestion, validation, storage, preprocessing and feature-extraction services.
-- Prepare run-based datasets and train, compare and evaluate the Random Forest baseline and justified alternatives.
-- Export and deploy the selected preprocessing and Edge-AI model pipeline on the Raspberry Pi.
-- Design and implement the `MOTOR_01` Digital Twin backend, state schema, history, data-quality handling, health logic and alerts.
-- Integrate model predictions with the Digital Twin and dashboard.
-- Diagnose schema, timing, reconnect, stale-data, model-compatibility and performance issues.
-- Coordinate end-to-end integration, measured validation and the final technical demonstration.
-
-They should divide this joint work into separate issues, branches and pull requests so both contributors' work is visible.
-
-#### Core Implementation — Kavana and Manyavasu
-
-Kavana and Manyavasu own moderate-complexity work that supplies reliable hardware and telemetry to the advanced technical core. Their tasks include safe sensor integration, ESP32 acquisition, MQTT publishing, calibration, controlled data collection and evidence gathering. Interface changes should be reviewed with Krutharth and Kishan before dataset collection begins.
-
-#### Applied Implementation — Monisha
-
-Monisha owns a medium-complexity applied role. She will build the initial dashboard interface after the data contract is available, display live values with units and timestamps, create historical sensor graphs, present Digital Twin health and alert states, review CSV outputs, and test disconnected, stale and invalid-data behaviour. She will document the dashboard setup and support the final presentation. Backend Edge-AI and Digital Twin logic remain with Krutharth and Kishan, who will provide and review the required interfaces.
-
-These are assigned responsibilities, not claims that implementation or validation has already been completed.
+Responsibilities identify the team's current areas of ownership without ranking their importance or difficulty. Members may collaborate across modules as needed. Each member should use their own branches, commits and pull requests so the repository accurately records their contributions.
 
 ## Future Results
 
