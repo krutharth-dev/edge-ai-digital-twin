@@ -2,14 +2,14 @@
 
 ## Scope
 
-This plan covers the low-voltage motor/fan prototype, sensors, ESP32, Raspberry Pi, power supplies, controlled abnormal-condition experiments, and nearby operators. It does not replace component datasheets, laboratory rules, supervisor instructions, or qualified electrical/mechanical review.
+This plan covers the low-voltage motor/fan prototype, sensors, ESP32, local edge host (Mac initially), power supplies, controlled abnormal-condition experiments, and nearby operators. It does not replace component datasheets, laboratory rules, supervisor instructions, or qualified electrical/mechanical review.
 
 ## Non-Negotiable Controls
 
 - Secure the motor/fan to a stable base.
 - Install a robust transparent guard around every rotating component.
 - Secure any imbalance mass so it cannot detach.
-- Keep the 12 V motor power path separate from ESP32 and Raspberry Pi power.
+- Keep the 12 V motor power path separate from ESP32 and local edge host (Mac initially) power.
 - Never route motor current through a solderless breadboard.
 - Use an appropriately rated fuse and accessible physical master/emergency switch.
 - Insulate exposed conductors and strain-relieve wires.
@@ -22,7 +22,7 @@ This plan covers the low-voltage motor/fan prototype, sensors, ESP32, Raspberry 
 - [ ] Motor, bracket, base, shaft/fan/load, and guard are secure
 - [ ] Imbalance/load apparatus is retained and cannot detach
 - [ ] Motor voltage, polarity, current path, fuse, and switch are verified
-- [ ] ESP32/Raspberry Pi are not carrying motor current
+- [ ] ESP32/local edge host (Mac initially) are not carrying motor current
 - [ ] Connections are insulated and strain-relieved
 - [ ] Sensors and cables cannot contact the rotating assembly
 - [ ] The emergency/master switch is reachable
