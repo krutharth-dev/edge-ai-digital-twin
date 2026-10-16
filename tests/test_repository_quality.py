@@ -1,7 +1,7 @@
 """Low-cost checks for the documented scaffold (not hardware or model tests)."""
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 import yaml
 
