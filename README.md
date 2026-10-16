@@ -9,7 +9,7 @@ A five-member academic engineering project developing a real-time condition-moni
 [![Project Status](https://img.shields.io/badge/status-under%20development-f59e0b?style=for-the-badge)](#development-status)
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](#technology-stack)
 [![ESP32](https://img.shields.io/badge/ESP32-sensor%20node-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](#hardware)
-[![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-edge%20computer-A22846?style=for-the-badge&logo=raspberrypi&logoColor=white)](#hardware)
+[![Intel Mac](https://img.shields.io/badge/Intel%20Mac-local%20edge-374151?style=for-the-badge&logo=apple&logoColor=white)](#technology-stack)
 [![MQTT](https://img.shields.io/badge/MQTT-telemetry-660066?style=for-the-badge&logo=mqtt&logoColor=white)](#communication-design)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)](#machine-learning-pipeline)
 
@@ -20,6 +20,7 @@ A five-member academic engineering project developing a real-time condition-moni
 
 ## Table of Contents
 
+- [Start Here: Software Development](#start-here-software-development)
 - [Project Overview](#project-overview)
 - [Project Documentation](#project-documentation)
 - [Planned Capabilities](#planned-capabilities)
@@ -42,27 +43,51 @@ A five-member academic engineering project developing a real-time condition-moni
 - [Future Results](#future-results)
 - [Success Criterion](#success-criterion)
 
+## Start here: software development
+
+**Current setup:** The team's **2017 Intel Mac** is the initial local edge host in place of a Raspberry Pi. The production-style ESP32 → MQTT → local Edge AI architecture remains the same; a Raspberry Pi is an optional later deployment target. The Mac can host Mosquitto, Python ingestion, model training/inference, Digital Twin state, and the Streamlit dashboard.
+
+**Begin with mock telemetry before connecting hardware.** The runnable synthetic publisher is only a transport/test aid, not real data or evidence of trained AI.
+
+1. [Mac software installation and local MQTT walkthrough](docs/SOFTWARE_SETUP_MAC.md)
+2. [Day 1 development plan — 17 October 2026](docs/DAY_1_PLAN.md)
+3. [Visual implementation and testing workflows](docs/WORKFLOWS.md)
+4. [MQTT message contract](docs/MQTT_CONTRACT.md)
+
+Quick local workflow after Python and Mosquitto setup:
+
+```bash
+source .venv/bin/activate
+# In a separate terminal, start: mosquitto -p 1883 -v
+# In another terminal, listen: mosquitto_sub -h localhost -t 'motor01/#' -v
+python scripts/demo_telemetry.py --mode cycle --count 20
+python -m pytest -q
+```
+
 ## Project Overview
 
 Industrial maintenance is commonly **reactive** (repair after failure) or **preventive** (service on a fixed schedule). Reactive maintenance risks unplanned downtime, while preventive maintenance can replace or service components that are still healthy. **Predictive maintenance** instead uses condition data to identify developing abnormalities and support maintenance decisions before major failure.
 
-This project proposes a compact predictive-maintenance testbed built around a **12 V DC motor/fan**, representing a small rotating machine. Four sensor types will measure vibration, temperature, electrical current, and rotational speed. An **ESP32** will acquire the measurements and publish telemetry over local Wi-Fi using **MQTT**. A **Raspberry Pi** will receive and store the data, preprocess signals, extract features, run a trained machine-learning model locally, maintain the Digital Twin state, and support dashboard and alert services.
+This project proposes a compact predictive-maintenance testbed built around a **12 V DC motor/fan**, representing a small rotating machine. Four sensor types will measure vibration, temperature, electrical current, and rotational speed. An **ESP32** will acquire the measurements and publish telemetry over local Wi-Fi using **MQTT**. A **local edge host** will receive and store the data, preprocess signals, extract features, run a trained machine-learning model locally, maintain the Digital Twin state, and support dashboard and alert services.
 
 The project integrates four distinct layers:
 
 | Layer | Purpose |
 |---|---|
 | **IoT sensing** | Acquire and transport physical measurements from the motor/fan |
-| **Edge AI** | Run low-latency machine-condition inference locally on the Raspberry Pi |
+| **Edge AI** | Run low-latency machine-condition inference locally on the local edge host |
 | **Digital Twin** | Maintain a continuously updated software representation of the physical asset |
 | **Predictive-maintenance logic** | Convert measurements and predictions into health states, warnings, and maintenance recommendations |
 
 **Core flow**
 
-`Physical motor/fan → Sensors → ESP32 → Wi-Fi/MQTT → Raspberry Pi → Preprocessing → Feature extraction → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
+`Physical motor/fan → Sensors → ESP32 → Wi-Fi/MQTT → local edge host → Preprocessing → Feature extraction → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
 
 ## Project Documentation
 
+- [Mac Software Setup](docs/SOFTWARE_SETUP_MAC.md) — software downloads, verification and MQTT proof of concept
+- [Day 1 Plan](docs/DAY_1_PLAN.md) — first development session with exit criteria
+- [Visual Workflows](docs/WORKFLOWS.md) — Mermaid architecture, validation, and collaboration diagrams
 - [Architecture](docs/ARCHITECTURE.md) — component responsibilities, data flow, deployment boundaries, and system invariants
 - [Architecture Decisions](docs/DECISIONS.md) — accepted scope and design choices that should not drift without team review
 - [MQTT Contract](docs/MQTT_CONTRACT.md) — proposed topics, payload envelopes, ownership, QoS, and reconnect behaviour
@@ -80,7 +105,7 @@ The completed prototype is intended to provide:
 - Multi-sensor monitoring of vibration, temperature, current, and RPM
 - ESP32-based sensor acquisition and telemetry packaging
 - Lightweight publish/subscribe communication using MQTT
-- Local preprocessing and feature extraction on the Raspberry Pi
+- Local preprocessing and feature extraction on the local edge host
 - Edge-AI classification of controlled operating conditions
 - Machine-health assessment and alert logic
 - Synchronized Digital Twin state for the physical motor/fan
@@ -117,7 +142,7 @@ flowchart TB
         E["ESP32<br/>Sensor node"] --> W["Local Wi-Fi"] --> Q["MQTT<br/>Telemetry"]
     end
 
-    subgraph G["Raspberry Pi edge platform"]
+    subgraph G["Local edge host (Intel Mac initially)"]
         direction TB
         PI["MQTT services"] --> PP["Signal preprocessing"]
         PP --> FE["Feature extraction"]
@@ -147,7 +172,7 @@ flowchart TB
 | Device | Primary responsibility |
 |---|---|
 | **ESP32** | Sensor acquisition, basic validation/timestamping, telemetry packaging, Wi-Fi connection, and MQTT publishing |
-| **Raspberry Pi** | MQTT services, local storage, preprocessing, feature extraction, live inference, health logic, Digital Twin backend, dashboard services, and alerts |
+| **Intel Mac edge host (initially)** | MQTT services, local storage, preprocessing, feature extraction, live inference, health logic, Digital Twin backend, dashboard services, and alerts |
 | **Development laptop** | Dataset exploration, model training and evaluation, and export of the selected model |
 
 ## Hardware
@@ -160,7 +185,7 @@ flowchart TB
 | **ACS712 current sensor** | Measures motor supply current | Indicates changes in electrical demand, including increased load |
 | **Hall-effect sensor + magnet** | Produces rotational pulses | Enables RPM calculation and speed-trend monitoring |
 | **ESP32 development board** | Reads sensors and publishes telemetry | IoT sensor-acquisition node |
-| **Raspberry Pi** | Performs local processing and hosts edge services | Edge computer for inference, storage, health logic, Digital Twin, and dashboard services |
+| **local edge host** | Performs local processing and hosts edge services | Edge computer for inference, storage, health logic, Digital Twin, and dashboard services |
 | **Regulated power supply and protection** | Powers the motor and electronics within rated limits | Supports safe and repeatable experiments |
 
 > Exact component ratings, wiring, sampling rates, and sensor calibration procedures will be documented after prototype integration and validation.
@@ -172,18 +197,18 @@ The initial stack has been selected at a technology-family level. Options marked
 | Layer | Planned technologies | Purpose / status |
 |---|---|---|
 | **Embedded / IoT** | ESP32, Arduino IDE or PlatformIO, Wi-Fi, MQTT | Sensor interfacing and telemetry; IDE/toolchain to be finalized |
-| **Edge platform** | Raspberry Pi, Raspberry Pi OS, Python, Mosquitto, Paho MQTT | Local MQTT, processing, inference, and application services |
+| **Edge platform** | Intel Mac (macOS initially), Python, Mosquitto, Paho MQTT; optional Raspberry Pi later | Local MQTT, processing, inference, and application services |
 | **Data processing** | NumPy, Pandas, SciPy | Signal windows, cleaning, transformation, and feature extraction |
 | **Machine learning** | scikit-learn, Random Forest, Gradient Boosting, Joblib | Initial model training, comparison, serialization, and deployment |
 | **Storage** | CSV initially; SQLite or InfluxDB if required | Begin with the simplest reproducible storage approach and expand only when justified |
 | **Dashboard / Digital Twin** | Streamlit or Node-RED; Grafana optional | Candidate options for visualization and operator interaction |
 | **Future model runtimes** | TensorFlow Lite or ONNX Runtime | Optional evaluation only if later models require them |
 
-Cloud services are not required for the core design: the proposed monitoring and inference path is local to the ESP32–Raspberry Pi system.
+Cloud services are not required for the core design: the proposed monitoring and inference path is local to the ESP32–local edge host system.
 
 ## Communication Design
 
-The proposed communication layer uses **MQTT over local Wi-Fi**. The ESP32 will publish sensor telemetry, while Raspberry Pi services will subscribe to the required topics. MQTT is suitable for the prototype because it is lightweight, decouples publishers from subscribers, and maps naturally to IoT telemetry.
+The proposed communication layer uses **MQTT over local Wi-Fi**. The ESP32 will publish sensor telemetry, while local edge host services will subscribe to the required topics. MQTT is suitable for the prototype because it is lightweight, decouples publishers from subscribers, and maps naturally to IoT telemetry.
 
 Proposed topic hierarchy:
 
@@ -202,16 +227,16 @@ The final message schema, Quality of Service level, publishing frequency, timest
 
 ## Why Edge AI?
 
-The project qualifies as **Edge AI** because live machine-learning inference is planned to run on the **Raspberry Pi beside the monitored equipment**, rather than depending on a remote cloud service. This can provide faster local decisions, continued operation without internet access, lower external data-transfer requirements, and improved control over machine data.
+The project qualifies as **Edge AI** because live machine-learning inference is planned to run on the **local edge host beside the monitored equipment**, rather than depending on a remote cloud service. This can provide faster local decisions, continued operation without internet access, lower external data-transfer requirements, and improved control over machine data.
 
 Edge AI does **not** require the model to be trained on the edge device. This project separates the two stages:
 
 | Stage | Planned location | Description |
 |---|---|---|
 | **Model training** | Development laptop | Use labelled experimental data to train, compare, and evaluate candidate models |
-| **Live model inference** | Raspberry Pi | Apply the exported preprocessing pipeline and trained model to incoming sensor windows in real time |
+| **Live model inference** | local edge host | Apply the exported preprocessing pipeline and trained model to incoming sensor windows in real time |
 
-The ESP32 remains focused on acquisition and communication; the more computationally intensive signal processing and inference will occur on the Raspberry Pi.
+The ESP32 remains focused on acquisition and communication; the more computationally intensive signal processing and inference will occur on the local edge host.
 
 ## Machine-Learning Pipeline
 
@@ -223,7 +248,7 @@ flowchart TB
         C --> D["Feature extraction"] --> E["Train and evaluate models"] --> F["Export selected pipeline"]
     end
 
-    subgraph LIVE["Live edge inference on Raspberry Pi"]
+    subgraph LIVE["Live edge inference on local edge host"]
         direction LR
         G["Live sensor windows"] --> H["Matching preprocessing"] --> I["Matching feature extraction"]
         I --> J["Exported ML model"] --> K["Condition prediction"] --> L["Health assessment"]
@@ -253,7 +278,7 @@ Vibration data will be processed in time windows rather than treated as isolated
 
 These vibration features can be combined with synchronized **temperature**, **current**, and **RPM** measurements to form the model input vector. The final feature set will be selected through experimental analysis and validation.
 
-To prevent training–deployment mismatch, the same preprocessing and feature definitions used during training will be exported or reproduced on the Raspberry Pi.
+To prevent training–deployment mismatch, the same preprocessing and feature definitions used during training will be exported or reproduced on the local edge host.
 
 ## Dataset and Evaluation Protocol
 
@@ -332,7 +357,7 @@ The repository now provides a documented scaffold for the planned implementation
 
 ```text
 edge-ai-digital-twin/
-├── .github/                    # Issue and pull-request templates
+├── .github/                    # Issue/PR templates and starter CI
 ├── ai/                         # Feature engineering, model training, and artifacts
 ├── dashboard/                  # Planned operator dashboard
 ├── data/                       # Dataset rules and local raw/processed folders
@@ -340,7 +365,8 @@ edge-ai-digital-twin/
 ├── docs/                       # Architecture, protocols, roadmap, tests, and safety
 ├── esp32/                      # Sensor-node firmware guidance
 ├── raspberry-pi/               # Edge-service guidance
-├── tests/                      # Validation strategy
+├── scripts/                    # Clearly labelled synthetic MQTT demo publisher
+├── tests/                      # Starter contract tests and validation strategy
 ├── .env.example                # Non-secret configuration template
 ├── .gitignore
 ├── requirements.txt            # Initial Python runtime dependencies
@@ -357,7 +383,7 @@ Implementation code will be added progressively inside these modules. Raw datase
 - [x] Complete initial predictive-maintenance research
 - [x] Design the high-level IoT and Edge-AI architecture
 - [x] Define the Digital Twin concept
-- [x] Select the primary sensors and processing hardware
+- [x] Select the primary sensors and initial Mac edge host
 - [x] Identify the initial software stack and ML approach
 - [x] Document architecture decisions, MQTT contract, dataset protocol, test plan, roadmap, and safety controls
 
@@ -366,7 +392,7 @@ Implementation code will be added progressively inside these modules. Raw datase
 - [ ] Construct and guard the physical motor/fan test rig
 - [ ] Integrate and calibrate the four primary sensors
 - [ ] Develop ESP32 acquisition firmware
-- [ ] Establish ESP32-to-Raspberry Pi MQTT communication
+- [ ] Establish ESP32-to-local edge host MQTT communication
 - [ ] Validate synchronized, timestamped sensor data flow
 
 ### Data and Machine Learning
@@ -379,7 +405,7 @@ Implementation code will be added progressively inside these modules. Raw datase
 
 ### Edge AI, Digital Twin, and Validation
 
-- [ ] Deploy the selected model to the Raspberry Pi
+- [ ] Deploy the selected model to the local edge host
 - [ ] Implement continuous live inference and health logic
 - [ ] Implement the `MOTOR_01` Digital Twin backend
 - [ ] Develop the monitoring dashboard and alerts
@@ -391,10 +417,10 @@ Implementation code will be added progressively inside these modules. Raw datase
 
 The agreed implementation order is:
 
-`Freeze scope and architecture → Build safe motor rig → Test sensors individually → Program ESP32 → Establish MQTT communication → Store live data → Collect normal data → Collect controlled abnormal data → Clean/window/extract features → Train and evaluate models → Deploy model on Raspberry Pi → Add health and alert logic → Build Digital Twin backend → Build dashboard → Integrate and validate`
+`Freeze scope and architecture → Build safe motor rig → Test sensors individually → Program ESP32 → Establish MQTT communication → Store live data → Collect normal data → Collect controlled abnormal data → Clean/window/extract features → Train and evaluate models → Deploy model on local edge host → Add health and alert logic → Build Digital Twin backend → Build dashboard → Integrate and validate`
 
 > [!IMPORTANT]
-> The earliest milestone is **physical motor → real sensor values → ESP32 → MQTT → Raspberry Pi → stored/live data**. Major AI optimization and dashboard styling should wait until this pipeline is reliable.
+> The earliest milestone is **physical motor → real sensor values → ESP32 → MQTT → local edge host → stored/live data**. Major AI optimization and dashboard styling should wait until this pipeline is reliable.
 
 ### Eight-Week Core Target
 
@@ -402,10 +428,10 @@ The agreed implementation order is:
 |---:|---|---|
 | **1–2** | Architecture, components, safe motor rig, and individual sensor tests | Stable physical platform and verified sensor readings |
 | **3** | ESP32 sensor acquisition | Timestamped and structured telemetry from the selected sensors |
-| **4** | MQTT, Raspberry Pi, and storage | Reliable live transmission and stored data |
+| **4** | MQTT, local edge host, and storage | Reliable live transmission and stored data |
 | **5** | Normal and controlled-fault data collection | Labelled, repeatable experimental runs with metadata |
 | **6** | Preprocessing, feature extraction, and model training | Evaluated baseline models with run-based splitting |
-| **7** | Raspberry Pi inference and Digital Twin/dashboard | Local live classification, synchronized state, trends, and alerts |
+| **7** | local edge host inference and Digital Twin/dashboard | Local live classification, synchronized state, trends, and alerts |
 | **8** | Integration, validation, and demonstration | Repeatable end-to-end demonstration and documented metrics |
 
 Remaining academic time can be used for additional sensors, stronger multi-class performance, improved health scoring, visualization, extended testing, and optional advanced features.
@@ -415,14 +441,14 @@ Remaining academic time can be used for additional sensors, stronger multi-class
 - The core project is **condition monitoring, anomaly/fault classification, and maintenance warning**.
 - The team will **not claim Remaining Useful Life (RUL)** from a few weeks or months of its own motor data. A separate RUL demonstration may use a suitable public run-to-failure dataset if time permits.
 - The Version 1 Digital Twin does not require a 3D motor model or high-fidelity physics simulation.
-- Cloud processing is not required for the core system; live inference must work locally on the Raspberry Pi.
+- Cloud processing is not required for the core system; live inference must work locally on the local edge host.
 - Health scores and maintenance messages are prototype decision-support outputs, not validated industrial safety or maintenance certification.
 ## Safety
 
 Because the testbed contains electrical and rotating components, safety is a design requirement rather than a final-stage addition.
 
 - Mount the motor securely on a stable base
-- Keep motor power separate from the ESP32 and Raspberry Pi power system
+- Keep motor power separate from the ESP32 and local edge host power system
 - Never route motor current through a solderless breadboard
 - Fit a transparent guard around all rotating components
 - Secure any experimental imbalance mass against detachment
@@ -473,7 +499,7 @@ Each pull request should describe the change, its test evidence, any affected in
 | Team member | GitHub | Primary responsibilities |
 |---|---|---|
 | **Krutharth** | [`@krutharth-dev`](https://github.com/krutharth-dev) | Overall system architecture; Digital Twin design and backend; Edge-AI methodology, training and evaluation; health and alert logic; cross-module integration; cross-functional coordination; technical guidance; interface and pull-request review; resolution of integration blockers; technical validation and final demonstration |
-| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | Raspberry Pi setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging |
+| **KISHAN-B-GOWDA** | [`@KISHAN-B-GOWDA`](https://github.com/KISHAN-B-GOWDA) | local edge host setup and integration; MQTT ingestion and local storage; signal preprocessing and feature extraction; Edge-AI model deployment; Digital Twin services; integration testing and debugging |
 | **kavanasomesh-spec** | [`@kavanasomesh-spec`](https://github.com/kavanasomesh-spec) | Motor power-system planning; fuse and emergency controls; physical safety; sensor wiring and mounting; calibration; controlled-condition setup and hardware test evidence |
 | **manyavasu2006** | [`@manyavasu2006`](https://github.com/manyavasu2006) | ESP32 sensor acquisition; telemetry formatting; Wi-Fi and MQTT publishing; run identification; labelled data collection; data-quality checking and communication tests |
 | **monishasm32-lab** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation work |
@@ -481,7 +507,7 @@ Each pull request should describe the change, its test evidence, any affected in
 #### Responsibility Overview
 
 - **Krutharth:** Defines the overall system architecture and Digital Twin design, develops the Edge-AI training and evaluation approach, establishes health and alert logic, brings the project modules together, and coordinates technical validation and the final demonstration. He also facilitates cross-functional collaboration, reviews interfaces and deliverables, shares implementation guidance, and works with team members to resolve technical and integration blockers across the project.
-- **KISHAN-B-GOWDA:** Configures and develops the Raspberry Pi environment, implements MQTT ingestion and local storage, builds the preprocessing and feature-extraction flow, deploys the selected Edge-AI model, connects Digital Twin services, and investigates integration problems.
+- **KISHAN-B-GOWDA:** Configures and develops the local edge host environment, implements MQTT ingestion and local storage, builds the preprocessing and feature-extraction flow, deploys the selected Edge-AI model, connects Digital Twin services, and investigates integration problems.
 - **kavanasomesh-spec:** Plans and assembles the motor power system, fuse and emergency controls, applies the physical safety requirements, mounts and wires the sensors, performs calibration, prepares controlled operating conditions, and records hardware test evidence.
 - **manyavasu2006:** Develops ESP32 sensor acquisition, structures telemetry with timestamps and run identification, implements Wi-Fi and MQTT publishing, participates in labelled data collection, checks data quality, and tests communication behaviour.
 - **monishasm32-lab:** Creates the Streamlit or Node-RED dashboard, presents live readings and historical graphs, displays health and alert states, reviews CSV outputs, connects the Digital Twin state to the interface, performs interface testing, and documents the dashboard and presentation workflow.
