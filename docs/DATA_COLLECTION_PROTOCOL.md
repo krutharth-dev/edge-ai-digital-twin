@@ -18,7 +18,7 @@ The first MVP may map all safely controlled abnormal runs to `ABNORMAL` until mu
 ## Before Each Run
 
 1. Complete the safety checklist and inspect the mount, guard, wiring, fuse, switch, and rotating assembly.
-2. Confirm motor, sensor, ESP32, Raspberry Pi, and MQTT status.
+2. Confirm motor, sensor, ESP32, local edge host (Mac initially), and MQTT status.
 3. Record hardware revision, firmware commit, configuration, sensor calibration, units, and sampling settings.
 4. Assign a unique run ID before recording.
 5. Confirm the intended class, speed/PWM setting, load/imbalance method, planned duration, and stop conditions.
