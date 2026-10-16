@@ -1,6 +1,6 @@
 # Initial Raspberry Pi, data, ML, and dashboard stack.
 # Freeze exact working versions after the first validated Raspberry Pi setup.
-paho-mqtt
+paho-mqtt>=2,<3
 python-dotenv
 numpy
 pandas
