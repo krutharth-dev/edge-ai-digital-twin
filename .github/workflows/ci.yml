@@ -1,0 +1,31 @@
+name: Software starter checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  demo-contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight test runner
+        run: python -m pip install pytest
+      - name: Check Python syntax
+        run: python -m compileall -q scripts tests
+      - name: Test synthetic MQTT data contract
+        run: python -m pytest -q
+
+# Hardware, real MQTT broker integration, ML and live dashboard are not yet
+# tested here. Add those jobs when their implementations are committed.
