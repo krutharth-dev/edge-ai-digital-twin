@@ -2,11 +2,11 @@
 
 The objective is to complete the working prototype in approximately eight weeks, leaving remaining academic time for stronger validation and optional improvements.
 
-## Week 1 — Freeze Design and Prepare Hardware
+## Week 1 — Software Prerequisites and Safe Hardware Planning
 
 **Work**
 
-- Confirm architecture decisions and team responsibilities
+- Complete [Mac software setup](SOFTWARE_SETUP_MAC.md), demonstrate local mock MQTT flow, and confirm architecture decisions and team responsibilities
 - Finalize bill of materials and rated component specifications
 - Create wiring, mounting, power-isolation, and safety plans
 - Define initial MQTT and data schemas
@@ -14,7 +14,7 @@ The objective is to complete the working prototype in approximately eight weeks,
 
 **Exit criteria**
 
-- Architecture and interfaces reviewed
+- Mac local broker, demo publisher and contract checks demonstrated; architecture and interfaces reviewed
 - Safety plan accepted
 - Components available or ordered
 - No unresolved uncertainty that blocks individual sensor testing
@@ -49,7 +49,7 @@ The objective is to complete the working prototype in approximately eight weeks,
 - No credentials are committed
 - The payload matches the documented contract
 
-## Week 4 — MQTT, Raspberry Pi, and Storage
+## Week 4 — MQTT, local edge host (Mac initially), and Storage
 
 **Work**
 
@@ -60,7 +60,7 @@ The objective is to complete the working prototype in approximately eight weeks,
 
 **Exit criteria**
 
-- Physical sensor values travel through ESP32 and MQTT to Raspberry Pi storage reliably
+- Physical sensor values travel through ESP32 and MQTT to local edge host (Mac initially) storage reliably
 - The core milestone is demonstrated repeatedly
 - Data can be traced to asset, timestamp, and run
 
@@ -99,7 +99,7 @@ The objective is to complete the working prototype in approximately eight weeks,
 
 **Work**
 
-- Deploy matching preprocessing/features/model on Raspberry Pi
+- Deploy matching preprocessing/features/model on local edge host (Mac initially)
 - Maintain `MOTOR_01` state and data quality
 - Add rule-based health and alert logic
 - Build live dashboard with values, trends, state, confidence when valid, and history
@@ -133,7 +133,7 @@ Five members may own workstreams, but every interface requires cross-review:
 
 1. Motor rig, power, and sensor integration
 2. ESP32 acquisition and MQTT publishing
-3. Raspberry Pi ingestion, storage, and edge deployment
+3. local edge host (Mac initially) ingestion, storage, and edge deployment
 4. Data processing, features, and ML evaluation
 5. Digital Twin, dashboard, testing, and documentation
 
@@ -141,4 +141,4 @@ Ownership should be recorded in issues and pull requests rather than fabricated 
 
 ## Definition of Done
 
-The core project is done when a safe physical condition change produces a measurable sensor response, local Raspberry Pi inference detects the condition, the Digital Twin changes automatically, the dashboard displays the correct health/alert state, and the team can reproduce and explain the result with traceable evidence.
+The **software-only demonstration is not the final outcome**. The core project is done when a safe physical condition change produces a measurable sensor response, local local edge host (Mac initially) inference detects the condition, the Digital Twin changes automatically, the dashboard displays the correct health/alert state, and the team can reproduce and explain the result with traceable evidence.
