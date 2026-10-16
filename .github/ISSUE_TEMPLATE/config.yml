@@ -1,2 +1,5 @@
 blank_issues_enabled: false
-contact_links: []
+contact_links:
+  - name: Security reporting guidance
+    url: https://github.com/krutharth-dev/edge-ai-digital-twin/blob/main/SECURITY.md
+    about: Report vulnerabilities privately; do not post credentials or exploits in public issues.

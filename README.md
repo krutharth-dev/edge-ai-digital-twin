@@ -22,6 +22,7 @@ A five-member academic engineering project developing a real-time condition-moni
 
 - [Project Overview](#project-overview)
 - [Project Documentation](#project-documentation)
+- [Getting Started](#getting-started)
 - [Planned Capabilities](#planned-capabilities)
 - [Version 1 Scope](#version-1-scope)
 - [System Architecture](#system-architecture)
@@ -72,6 +73,27 @@ The project integrates four distinct layers:
 - [Safety Plan](docs/SAFETY.md) — electrical, mechanical, thermal, experimental, and emergency controls
 
 Module-specific guidance is available in the `esp32`, `raspberry-pi`, `ai`, `digital-twin`, `dashboard`, `data`, and `tests` directories. These files describe the agreed interfaces and implementation order; they do not claim that the corresponding software has already been completed.
+
+## Getting Started
+
+**Current state:** this repository is a design-first scaffold. Hardware drivers, edge services, the trained model, and the dashboard are **not yet implemented**, so there is no executable end-to-end demo or accuracy claim.
+
+1. Review the [architecture](docs/ARCHITECTURE.md), [safety plan](docs/SAFETY.md), and [MQTT contract](docs/MQTT_CONTRACT.md).
+2. Copy `.env.example` to an untracked `.env` and set only configuration appropriate to your own test setup. Never add real passwords to Git.
+3. For future Python development, create a virtual environment and install `requirements-dev.txt` from the repository root.
+4. Run `python -m pytest -q` to validate the repository scaffold; these checks are **not** hardware or ML validation.
+5. Start implementation with individual sensor tests, then a real ESP32 → MQTT → Raspberry Pi data-ingestion loop. Follow the [roadmap](docs/ROADMAP.md).
+
+```bash
+git clone https://github.com/krutharth-dev/edge-ai-digital-twin.git
+cd edge-ai-digital-twin
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+```
+
+The repository is private, so cloning requires access. On Windows, activate the environment with `.venv\\Scripts\\activate` instead.
 
 ## Planned Capabilities
 
@@ -349,6 +371,7 @@ edge-ai-digital-twin/
 ```
 
 Implementation code will be added progressively inside these modules. Raw datasets, trained-model binaries, credentials, local databases, logs, and generated outputs are excluded from Git unless the team explicitly approves a small reproducible example.
+
 ## Development Status
 
 ### Research and Design
@@ -364,17 +387,17 @@ Implementation code will be added progressively inside these modules. Raw datase
 ### Hardware and IoT
 
 - [ ] Construct and guard the physical motor/fan test rig
-- [ ] Integrate and calibrate the four primary sensors
+- [ ] Integrate and calibrate the MVP sensors, then extend to all four
 - [ ] Develop ESP32 acquisition firmware
 - [ ] Establish ESP32-to-Raspberry Pi MQTT communication
 - [ ] Validate synchronized, timestamped sensor data flow
 
 ### Data and Machine Learning
 
-- [ ] Define the experiment and labelling protocol
+- [x] Draft the experiment and labelling protocol (implementation and validation remain pending)
 - [ ] Collect normal and controlled abnormal-condition datasets
 - [ ] Implement preprocessing and feature extraction
-- [ ] Train and evaluate Random Forest and Gradient Boosting models
+- [ ] Train and evaluate a Random Forest baseline; compare other models if justified
 - [ ] Select and export the best validated model pipeline
 
 ### Edge AI, Digital Twin, and Validation
@@ -417,6 +440,7 @@ Remaining academic time can be used for additional sensors, stronger multi-class
 - The Version 1 Digital Twin does not require a 3D motor model or high-fidelity physics simulation.
 - Cloud processing is not required for the core system; live inference must work locally on the Raspberry Pi.
 - Health scores and maintenance messages are prototype decision-support outputs, not validated industrial safety or maintenance certification.
+
 ## Safety
 
 Because the testbed contains electrical and rotating components, safety is a design requirement rather than a final-stage addition.
@@ -439,34 +463,9 @@ Because the testbed contains electrical and rotating components, safety is a des
 
 The project is being developed by a **five-member academic team** in one shared GitHub repository. Work should be divided into modular branches and integrated through reviewed pull requests.
 
-### Recommended Workflow
+### Review Workflow
 
-`Create branch → Make focused changes → Commit → Push → Open pull request → Review and test → Merge`
-
-Example branch names:
-
-```text
-feature/esp32-sensors
-feature/mqtt-communication
-feature/ai-training
-feature/edge-inference
-feature/digital-twin
-feature/dashboard
-docs/project-documentation
-```
-
-Example commit messages:
-
-```text
-feat: add ADXL345 vibration acquisition
-feat: implement MQTT sensor publishing
-feat: add Random Forest training pipeline
-fix: correct RPM calculation
-docs: update architecture diagram
-test: validate MQTT communication
-```
-
-Each pull request should describe the change, its test evidence, any affected interfaces or MQTT topics, and any follow-up work. Git history and pull-request reviews will provide a transparent record of individual contributions.
+Contributors work on focused branches, include validation evidence in pull requests, and update interface documents when behaviour changes. Follow [CONTRIBUTING.md](CONTRIBUTING.md), the [pull-request template](.github/PULL_REQUEST_TEMPLATE.md), and the [security policy](SECURITY.md); avoid pushing directly to `main`.
 
 ### Team Responsibilities and Contributors
 
@@ -478,15 +477,7 @@ Each pull request should describe the change, its test evidence, any affected in
 | **Manya V** | [`@manyavasu2006`](https://github.com/manyavasu2006) | ESP32 sensor acquisition; telemetry formatting; Wi-Fi and MQTT publishing; run identification; labelled data collection; data-quality checking and communication tests |
 | **Monisha SM** | [`@monishasm32-lab`](https://github.com/monishasm32-lab) | Streamlit or Node-RED dashboard setup; live sensor cards and graphs; health, warning and alert display; CSV data review; Digital Twin UI integration; interface testing; documentation and presentation work |
 
-#### Responsibility Overview
-
-- **Krutharth P Gowda:** Defines the overall system architecture and Digital Twin design, develops the Edge-AI training and evaluation approach, establishes health and alert logic, brings the project modules together, and coordinates technical validation and the final demonstration. He also facilitates cross-functional collaboration, reviews interfaces and deliverables, shares implementation guidance, and works with team members to resolve technical and integration blockers across the project.
-- **Kishan B Gowda:** Configures and develops the Raspberry Pi environment, implements MQTT ingestion and local storage, builds the preprocessing and feature-extraction flow, deploys the selected Edge-AI model, connects Digital Twin services, and investigates integration problems.
-- **Kavana S:** Plans and assembles the motor power system, fuse and emergency controls, applies the physical safety requirements, mounts and wires the sensors, performs calibration, prepares controlled operating conditions, and records hardware test evidence.
-- **Manya V:** Develops ESP32 sensor acquisition, structures telemetry with timestamps and run identification, implements Wi-Fi and MQTT publishing, participates in labelled data collection, checks data quality, and tests communication behaviour.
-- **Monisha SM:** Creates the Streamlit or Node-RED dashboard, presents live readings and historical graphs, displays health and alert states, reviews CSV outputs, connects the Digital Twin state to the interface, performs interface testing, and documents the dashboard and presentation workflow.
-
-The responsibilities above identify the team's current areas of ownership. Members may collaborate across modules as needed. Each member should use their own branches, commits and pull requests so the repository accurately records their contributions.
+The responsibilities above describe **planned ownership**, not proof that the modules have been implemented. The team coordinates interface changes through issues, commits, reviews, and test evidence; members may assist across workstreams.
 
 ## Future Results
 
@@ -511,7 +502,7 @@ The primary end-to-end demonstration goal is:
 
 The target demonstration sequence is:
 
-`Normal operation → Live readings → HEALTHY classification → Introduce a safe controlled abnormal condition → Sensor response changes → Edge AI detects the condition → Digital Twin changes automatically → Warning appears → Remove abnormal condition → System returns to normal`
+`Normal operation → Live readings → HEALTHY health state → Introduce a safe controlled abnormal condition → Sensor response changes → Edge AI detects the condition → Digital Twin changes automatically → Warning appears → Remove abnormal condition → System returns to normal`
 
 A successful implementation will demonstrate the disciplined integration of **IoT sensing, sensor fusion, Edge AI, predictive-maintenance logic, and Digital Twin technology** in one functioning academic prototype.
 

@@ -22,7 +22,7 @@ The first MVP may map all safely controlled abnormal runs to `ABNORMAL` until mu
 3. Record hardware revision, firmware commit, configuration, sensor calibration, units, and sampling settings.
 4. Assign a unique run ID before recording.
 5. Confirm the intended class, speed/PWM setting, load/imbalance method, planned duration, and stop conditions.
-6. Start telemetry storage before energizing the motor.
+6. Start telemetry storage before energizing the motor. Verify that the Raspberry Pi can record receipt time if the ESP32's UTC clock is not synchronized.
 7. Do not begin if any sensor is invalid or time/run identification is missing.
 
 ## During Each Run
@@ -78,16 +78,18 @@ Vibration may use a separate long-format file:
 
 Do not mix units within a column.
 
+If the ESP32 clock is unsynchronized, store source `uptime_ms`, `boot_id`, `sequence`, and separate Raspberry Pi `received_at_utc`; never mislabel uptime as `timestamp_ms` UTC. The final CSV schema must clearly distinguish these fields, even if slow and vibration telemetry use different tables.
+
 ## Windowing and Features
 
 Window length, overlap, filtering, and sample rate must be fixed in a versioned feature configuration. Candidate vibration features include RMS, standard deviation, peak, peak-to-peak, kurtosis, crest factor, dominant frequency, and FFT-band energy. Temperature, current, and RPM may be joined by timestamp/window.
 
 ## Leakage-Safe Splitting
 
-- Assign complete run IDs to training, validation, or test sets.
+- Assign complete run IDs to training, validation, or test sets. Keep correlated repeats from one uninterrupted experimental setup together when required to avoid optimistic scores.
 - Never randomly split adjacent windows from one run across sets.
 - Fit scalers, imputers, feature selectors, and other learned preprocessing only on training runs.
-- Keep a final test set untouched until model choices are complete.
+- Keep a final test set untouched until model choices are complete. Where possible, evaluate runs collected at different times or configurations to probe generalization.
 - Report split membership and class distribution.
 
 ## Quality Control

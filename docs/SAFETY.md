@@ -14,6 +14,9 @@ This plan covers the low-voltage motor/fan prototype, sensors, ESP32, Raspberry 
 - Use an appropriately rated fuse and accessible physical master/emergency switch.
 - Insulate exposed conductors and strain-relieve wires.
 - Operate within every motor, controller, sensor, wire, connector, and power-supply rating.
+
+- Check **signal-level** voltage compatibility: 5 V-powered analog sensor outputs must not exceed the ESP32 input rating.
+- Power down and verify isolation before altering circuit wiring, load attachments, or magnet positions.
 - Keep hands, hair, clothing, cables, tools, and loose objects outside the guarded area.
 - Never rely on MQTT, AI, the Digital Twin, or the dashboard as the sole stop mechanism.
 
@@ -66,6 +69,10 @@ Treat temperature as a slow supporting signal. Do not exceed component ratings, 
 - Prevent motor electrical noise from entering logic power through careless wiring.
 - Power down before changing wiring or mechanical configuration.
 - Do not probe moving hardware or exposed live conductors unnecessarily.
+
+## Safety Sign-off Record
+
+Before the first powered run, document the inspected build revision, supply voltage/current limits, fuse and switch ratings, guarding, sensor voltage levels, emergency stop procedure, test operator, and supervisor approval if required. Recheck after any mechanical or power-system modification. An MQTT alert is informative only and never replaces immediate physical isolation.
 
 ## Incident and Near-Miss Record
 

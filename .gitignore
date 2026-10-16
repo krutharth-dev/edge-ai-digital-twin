@@ -4,6 +4,8 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.tox/
 .coverage
 htmlcov/
 .venv/
@@ -22,6 +24,7 @@ data/raw/*
 !data/raw/README.md
 data/processed/*
 !data/processed/README.md
+# Approved small example datasets can be explicitly force-added after review.
 ai/models/*
 !ai/models/README.md
 *.csv
@@ -45,6 +48,12 @@ reports/generated/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Firmware, runtime and generated output
+*.elf
+*.uf2
+*.hex
+artifacts/
 
 # Build output
 build/

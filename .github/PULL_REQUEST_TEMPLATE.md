@@ -21,9 +21,16 @@ Closes #
 
 List changed pin assignments, units, sample rates, MQTT topics/payloads, data columns, model features, configuration keys, or Digital Twin fields. Write "None" if no interface changed.
 
+## Change Type
+
+- [ ] Documentation or project setup
+- [ ] Implemented software or firmware
+- [ ] Hardware integration
+- [ ] Experimental protocol or measured results
+
 ## Validation Evidence
 
-List the commands, tests, controlled experiments, or manual checks performed and their results. For hardware work, describe only safe, repeatable tests.
+List the exact commands, tests, controlled experiments, or manual checks performed and their results. For hardware work, describe only safe, repeatable tests. If the change is documentation-only, say so; do not claim that the scaffold tests validate physical hardware.
 
 ## Data and ML Integrity
 

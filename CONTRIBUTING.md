@@ -58,6 +58,17 @@ Document every changed:
 - Store model metadata with the artifact: feature order, preprocessing version, labels, training commit, and dataset/run manifest.
 - Never fabricate performance, hardware behaviour, or validation outcomes.
 
+## Local Checks
+
+Run from the repository root after installing `requirements-dev.txt`:
+
+```bash
+python -m pytest -q
+python -m ruff check .
+```
+
+The existing tests verify documentation links and repository metadata. They do not verify physical hardware, sensor readings, model quality, or end-to-end behaviour. Add separate deterministic tests as each executable module is implemented.
+
 ## Code and Documentation Quality
 
 - Keep modules small and responsibilities explicit.

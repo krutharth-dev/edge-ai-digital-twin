@@ -12,6 +12,7 @@ We are committed to a welcoming, respectful, harassment-free, and academically h
 - Keep discussions focused on the project and its learning objectives.
 - Credit other people's work, data, and ideas appropriately.
 - Report limitations, failures, and experimental results honestly.
+- Separate proposed responsibilities from completed, attributable contributions.
 - Raise electrical, mechanical, data, or security risks promptly.
 - Take responsibility for mistakes and help correct them.
 

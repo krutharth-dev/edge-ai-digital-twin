@@ -28,7 +28,10 @@ Every JSON payload should contain:
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "run_id": null,
   "quality": "VALID"
@@ -37,8 +40,10 @@ Every JSON payload should contain:
 
 Rules:
 
-- `timestamp_ms` is Unix epoch milliseconds when time synchronization is available.
-- `sequence` increases per publisher boot/session and helps detect loss, duplicates, and reordering.
+- `timestamp_ms` is UTC Unix epoch milliseconds **only after** device clock synchronization; use JSON `null` when unavailable, never a fictitious epoch `0`.
+- `clock_status` is `SYNCED` or `UNSYNCED`. `uptime_ms` is monotonic device uptime (not UTC time).
+- `boot_id` identifies the publisher's boot/session; use a new ID after restart. `sequence` increments on each topic within that boot and helps detect duplicates and reordering.
+- The Raspberry Pi records an ingestion/receipt timestamp for each message and distinguishes it from source time. Freshness policy must account for unsynchronized clocks.
 - `run_id` is required during labelled data collection and null during ordinary monitoring.
 - `quality` is one of `VALID`, `INVALID`, `STALE`, or `CALIBRATION_REQUIRED`.
 - Unknown schema versions must be rejected explicitly.
@@ -52,7 +57,10 @@ Rules:
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "run_id": "normal_speed1_run01",
   "quality": "VALID",
@@ -67,7 +75,10 @@ Rules:
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "run_id": "normal_speed1_run01",
   "quality": "VALID",
@@ -82,7 +93,10 @@ Rules:
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "run_id": "normal_speed1_run01",
   "quality": "VALID",
@@ -98,7 +112,10 @@ Rules:
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "run_id": "normal_speed1_run01",
   "quality": "VALID",
@@ -111,6 +128,8 @@ Rules:
 }
 ```
 
+The numeric zeros and empty arrays above are **schema placeholders**, not measured sensor readings or suggested sampling rates. Choose realistic values only after hardware tests.
+
 The team may change raw vibration transport after measuring ESP32 memory, MQTT payload size, and achievable sample rate. Any change must be versioned and reflected in both firmware and Raspberry Pi parsers.
 
 ## Health Payload
@@ -119,7 +138,10 @@ The team may change raw vibration transport after measuring ESP32 memory, MQTT p
 {
   "schema_version": 1,
   "asset_id": "MOTOR_01",
-  "timestamp_ms": 0,
+  "timestamp_ms": null,
+  "clock_status": "UNSYNCED",
+  "boot_id": "example-boot-001",
+  "uptime_ms": 0,
   "sequence": 0,
   "quality": "VALID",
   "predicted_state": "NORMAL",
@@ -148,6 +170,13 @@ Initial guidance:
 - Alerts: QoS 1, not retained; alert state remains available through `health`
 
 Final settings must be justified by packet loss, latency, duplicate handling, and resource tests.
+
+## MQTT Session and Time Handling
+
+- A reconnect within the same boot must not create a new `boot_id`. A physical reboot must.
+- Use bounded queueing; QoS 1 may redeliver messages, so subscribers must deduplicate safely.
+- A retained status or health message represents the most recently published state, not necessarily the current state. Apply the freshness timeout before displaying `HEALTHY`.
+- Do not permit telemetry to trigger physical motor-control outputs without separately reviewed safety controls.
 
 ## Validation
 

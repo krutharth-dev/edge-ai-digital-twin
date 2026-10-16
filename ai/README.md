@@ -41,6 +41,12 @@ Context features may include current, temperature, RPM, and changes from a run o
 9. Export model plus preprocessing/feature metadata.
 10. Verify Raspberry Pi feature parity and latency.
 
+## Leakage and Baseline Checks
+
+A dataset split is defined by **run ID**, never by individual sliding windows. Keep every run wholly within one split, preserve the held-out test runs until model selection is complete, and fit feature scaling or imputation using training runs only. Save a split manifest alongside the model metadata so that an evaluation can be reproduced.
+
+Before using the trained pipeline on the Raspberry Pi, test the feature names, exact order, units, window boundaries, and missing-data policy against offline fixtures. Record the training commit and reject mismatched schemas rather than silently padding or reordering inputs.
+
 ## Evaluation
 
 Report accuracy, macro-F1, per-class precision/recall, confusion matrix, false alarms, run/class distribution, split membership, and inference latency. Never report window-randomized performance as the primary result.

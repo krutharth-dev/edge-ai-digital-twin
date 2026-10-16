@@ -57,6 +57,10 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: Dependencies and validation plan
+      description: Which hardware, test data, interfaces, or previously completed milestones must exist first? What test will prove the change works?
+  - type: textarea
+    attributes:
       label: Alternatives considered
       description: Describe simpler approaches or workarounds.
   - type: textarea

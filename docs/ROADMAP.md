@@ -127,6 +127,10 @@ The objective is to complete the working prototype in approximately eight weeks,
 - Results are measured, not estimated
 - Safety, architecture, source code, data manifest, model metadata, and presentation agree
 
+## Weekly Review Gate
+
+At the end of each week, attach the relevant commit, wiring/schema revision, test or run IDs, observed evidence, outstanding risks, and next owner to the milestone issue. Mark a deliverable **implemented** only when code or hardware exists, and **validated** only when test evidence is linked. If a dependency is blocked (for example, no compatible ESP32 board or motor guard), record the blocker instead of claiming the milestone is complete.
+
 ## Parallel Team Workstreams
 
 Five members may own workstreams, but every interface requires cross-review:

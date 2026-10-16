@@ -32,6 +32,14 @@ Streamlit or Node-RED is appropriate for the first working version. Grafana and 
 - Avoid motor-control buttons unless a separately reviewed safety design exists.
 - Make the normal-to-abnormal-to-recovery sequence easy to demonstrate.
 
+## Interaction and Accessibility
+
+- Display the freshness indicator and timestamp beside each value so cached data cannot resemble live data.
+- Use text labels alongside colours for all health and alert states.
+- On connection loss, show the last-known reading as **stale** or `N/A`, not as a fresh `HEALTHY` result.
+- Keep unit conversions explicit in chart titles and downloads.
+- The UI is read-only in the MVP; physical stop and isolation remain hardware controls.
+
 ## Acceptance Evidence
 
 The dashboard is ready when it reflects the same timestamped Digital Twin state, survives data interruptions without showing false health, and clearly displays the end-to-end demonstration transitions.

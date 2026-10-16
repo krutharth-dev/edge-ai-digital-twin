@@ -50,6 +50,14 @@ raspberry-pi/
 
 Read hostnames, paths, credentials, and deployment settings from local configuration based on `.env.example`. Do not hard-code secrets. Validate MQTT payloads before storage or inference.
 
+## Processing and Recovery Rules
+
+- Record broker receipt time even if the ESP32 has no synchronized wall clock.
+- Validate and deduplicate messages by topic, boot/session ID, and sequence; retain provenance when converting raw samples into windows.
+- Specify a maximum acceptable data age once measured. Expired values must not silently maintain a `HEALTHY` Digital Twin.
+- Continue capture and storage when inference or the dashboard fails; surface the unavailable component explicitly.
+- Do not load unknown Joblib/pickle model files. Verify artifact provenance and ordered input schema before inference.
+
 ## Acceptance Evidence
 
 The edge platform is ready when it can survive restart/reconnect tests, store traceable telemetry, reject malformed/stale data, reproduce training-time features, run the selected model locally, and update the Digital Twin without depending on cloud services.

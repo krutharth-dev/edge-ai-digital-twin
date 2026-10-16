@@ -4,6 +4,21 @@
 
 Testing follows [the project test plan](../docs/TEST_PLAN.md).
 
+## Available Checks
+
+From the repository root, install the development dependencies and run:
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+python -m ruff check .
+```
+
+`test_repository_quality.py` checks internal documentation file paths, the GitHub templates/workflow YAML, and the presence of the core design contracts. These are **scaffold checks only**, not proof that hardware, model inference, or the dashboard works.
+
+## Future Validation
+
+
 Planned categories:
 
 - Sensor-driver and calibration checks
