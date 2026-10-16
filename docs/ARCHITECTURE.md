@@ -6,9 +6,9 @@ The project is a low-cost academic prototype for monitoring a 12 V DC motor/fan.
 
 The core path is:
 
-`Motor/fan → Sensors → ESP32 → Wi-Fi/MQTT → Raspberry Pi → Preprocessing/features → ML inference → Health logic → Digital Twin → Dashboard/alerts`
+`Motor/fan → Sensors → ESP32 → Wi-Fi/MQTT → local edge host → Preprocessing/features → ML inference → Health logic → Digital Twin → Dashboard/alerts`
 
-The earliest integration milestone ends at reliable storage of real telemetry on the Raspberry Pi. AI and dashboard work must not hide an unstable acquisition pipeline.
+The first software milestone is local, explicitly synthetic MQTT transport. The **hardware integration gate** remains reliable storage of **real ESP32 sensor telemetry** on the local edge host. AI and dashboard work must not hide an unstable acquisition pipeline.
 
 ## Physical and Sensor Layer
 
@@ -36,9 +36,9 @@ The ESP32 is responsible for:
 
 The ESP32 is not responsible for model training, the main ML inference pipeline, historical storage, or the Digital Twin backend.
 
-## Raspberry Pi Boundary
+## Local Edge Host Boundary (Intel Mac initially)
 
-The Raspberry Pi is the edge platform and is responsible for:
+The **Intel Mac** is the initial local edge platform (a Raspberry Pi can replace it later) and is responsible for:
 
 - Hosting or connecting to the local MQTT broker
 - Subscribing to telemetry and checking schema, freshness, units, ranges, and asset ID
@@ -64,7 +64,7 @@ Development laptops may be used for exploratory analysis and training. The deplo
 - Source commit
 - Evaluation results and limitations
 
-The Raspberry Pi must reproduce the same preprocessing and feature definitions.
+The local edge host must reproduce the same preprocessing and feature definitions.
 
 ## Digital Twin Boundary
 
@@ -99,7 +99,7 @@ A dashboard visualizes this state but is not itself the complete Digital Twin.
 - Sensor units and sampling settings are explicit.
 - Stale, malformed, or out-of-range telemetry cannot silently become a healthy state.
 - Training/test separation is performed by complete experimental run.
-- Model inputs on the Raspberry Pi match training-time feature definitions.
+- Model inputs on the local edge host match training-time feature definitions.
 - Health and maintenance messages distinguish rule-based logic from model output.
 - No short-duration project dataset is presented as validated Remaining Useful Life evidence.
 - Physical safety controls do not depend on the dashboard, network, or ML model.
@@ -119,4 +119,4 @@ A dashboard visualizes this state but is not itself the complete Digital Twin.
 
 ## Planned Deployment
 
-All core services run on the local ESP32–Raspberry Pi network. CSV is the initial storage format. SQLite or InfluxDB may be introduced only if live history or query requirements justify the added complexity. Streamlit or Node-RED is suitable for Version 1; Grafana and 3D views are optional later enhancements.
+All core services run on the local ESP32–edge-host network when real hardware is integrated. During software-first tests, the mock publisher and broker both run on the Mac. CSV is the initial storage format. SQLite or InfluxDB may be introduced only if live history or query requirements justify the added complexity. Streamlit or Node-RED is suitable for Version 1; Grafana and 3D views are optional later enhancements.
