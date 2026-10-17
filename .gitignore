@@ -16,6 +16,7 @@ venv/
 secrets.*
 *.pem
 *.key
+esp32/firmware/secrets.h
 
 # Data, databases, logs, and generated artifacts
 data/raw/*
