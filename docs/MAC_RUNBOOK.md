@@ -3,31 +3,54 @@
 This project is a **local Mac + ESP32** academic MVP. Raspberry Pi references
 in legacy docs mean the Mac backend service in this version. No Raspberry Pi needed.
 
-## Safe checkout of the entire finished software branch
+## Safely update the existing Mac checkout from GitHub main
 
-Run in the **normal macOS Terminal**, not a fresh clone:
+Use your **normal macOS Terminal**. The completed software MVP has already
+been merged into **main**. You do NOT need to clone a second project or switch
+to the older feature/full-stack-mvp-2026-10 development branch.
 
-    cd ~/edge-ai-digital-twin
-    git status
+~~~bash
+cd ~/edge-ai-digital-twin
+git status --short
+git branch --show-current
+~~~
 
-If you have local changes, DO NOT discard or force reset them. Back up first:
+If you see any local changes you want to preserve, make a temporary backup:
 
-    git stash push -u -m "My local backup before full-stack MVP"
+~~~bash
+git stash push -u -m "Backup before pulling Mac software MVP"
+~~~
 
-Then fetch without changing the current working branch:
+This stashes tracked changes and untracked files, but not ignored files.
+Your ignored .venv, SQLite database and model artifacts stay on disk.
 
-    git fetch origin
-    git switch -c feature/full-stack-mvp-2026-10 --track origin/feature/full-stack-mvp-2026-10
+Then download the new commits, switch to main, and pull without rewriting history:
 
-If that local branch already exists:
+~~~bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git status
+~~~
 
-    git switch feature/full-stack-mvp-2026-10
-    git pull --ff-only
+If Git stops because main diverged or you have local conflicts, **do not**
+run reset --hard, git clean -fd, or force pull. Inspect the output first.
 
-To retrieve any stashed personal changes later, REVIEW first with
-    git stash list
-    git stash show --stat stash@{0}
-and only then consider git stash pop; it may cause conflicts.
+To review personal changes that were stashed:
+
+~~~bash
+git stash list
+git stash show --stat stash@{0}
+~~~
+
+Only restore them when you understand which files would be changed:
+
+~~~bash
+git stash pop
+~~~
+
+It is normal for old backend-ai changes to be on their original branch.
+Do not blindly pop that backup over the new main code.
 
 ## Install Python dependencies
 

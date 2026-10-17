@@ -1,7 +1,7 @@
 name: Software MVP tests
 on:
   push:
-    branches: ["feature/full-stack-mvp-2026-10", "main"]
+    branches: ["main"]
   pull_request:
 
 jobs:
@@ -13,8 +13,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt
-      - run: python -m pytest -q tests/test_software_mvp.py tests/test_real_training.py
-      - run: python -m compileall -q edge_ai_twin ai dashboard raspberry-pi simulator
+      - run: python -m pytest -q tests/test_software_mvp.py tests/test_real_training.py tests/test_readme.py
+      - run: python scripts/check_environment.py
+      - run: python -m compileall -q edge_ai_twin ai dashboard raspberry-pi simulator scripts
 
   mqtt_integration:
     runs-on: ubuntu-latest
