@@ -1,3 +1,40 @@
+# Edge-AI Predictive Maintenance + Digital Twin — Mac Software MVP
+
+**Current implementation (October 2026):** The MacBook replaces Raspberry Pi as
+the local edge computer. The main branch includes MQTT ingestion, SQLite history,
+an operational Digital Twin, Streamlit dashboard, alerts, synthetic demonstrations,
+optional Random Forest inference, run-wise real-data training scripts and ESP32 references.
+
+**Start here:** [Mac runbook](docs/MAC_RUNBOOK.md) | [Implementation status](docs/IMPLEMENTATION_STATUS.md) | [Optional ESP32 LAN MQTT](docs/LAN_MQTT_SETUP.md)
+
+Quick software-only demo (start each command in a separate Terminal):
+
+```bash
+# Terminal A (after activating .venv)
+python raspberry-pi/live_service.py
+```
+```bash
+# Terminal B
+python -m streamlit run dashboard/app.py
+```
+```bash
+# Terminal C
+python simulator/mqtt_publisher.py --scenario normal --count 20
+python simulator/mqtt_publisher.py --scenario overload --count 20
+```
+
+Use live_service.py instead of the old mqtt_receiver.py when running the Twin.
+All synthetic motor data, model test accuracy and rule thresholds are demos,
+not real fault detection or certified motor safety controls. ESP32/Wokwi must
+still be compiled and calibrated on actual target setups.
+
+---
+
+## Original project proposal and Raspberry Pi architecture (historical)
+
+Older sections below describe the initial Raspberry Pi-based research plan.
+Read MacBook for the deployed edge computer, and distinguish planned components
+from physically validated components.
 <div align="center">
 
 # Edge-AI Digital Twin for Predictive Maintenance
