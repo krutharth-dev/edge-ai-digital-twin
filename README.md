@@ -1,10 +1,12 @@
 # Edge-AI Predictive Maintenance + Digital Twin
 
+[![Software CI](https://github.com/krutharth-dev/edge-ai-digital-twin/actions/workflows/software-tests.yml/badge.svg?branch=main)](https://github.com/krutharth-dev/edge-ai-digital-twin/actions/workflows/software-tests.yml) [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) ![Python 3.12](https://img.shields.io/badge/python-3.12-blue) ![Academic prototype](https://img.shields.io/badge/status-software%20MVP-orange)
+
 **Local, Mac-hosted condition monitoring for a DC motor/fan.** The software combines ESP32/IoT telemetry, MQTT, SQLite, optional Edge-AI fault classification, an operational Digital Twin, and a live Streamlit dashboard.
 
 **Current stage:** The **software demonstration MVP is implemented and automatically tested**. Physical motor integration, ESP32/Wokwi compilation, calibration, and real-world fault-detection accuracy **have not been verified**.
 
-[Installation and full runbook](docs/MAC_RUNBOOK.md) · [Implementation status](docs/IMPLEMENTATION_STATUS.md) · [MQTT interface](docs/MQTT_CONTRACT.md) · [Hardware safety](docs/SAFETY.md)
+[Mac runbook](docs/MAC_RUNBOOK.md) · [Workflow diagrams](docs/WORKFLOWS.md) · [Pull-request guide](docs/PR_GUIDE.md) · [Implementation status](docs/IMPLEMENTATION_STATUS.md) · [MQTT contract](docs/MQTT_CONTRACT.md) · [Hardware safety](docs/SAFETY.md)
 
 ## Overview
 
