@@ -1,8 +1,8 @@
 # Contributing to Edge-AI Digital Twin
 
-This repository supports a five-member academic project building a low-cost rotating-machine condition-monitoring prototype. Contributions should move the project toward a reliable end-to-end path:
+This repository supports an academic project building a low-cost rotating-machine condition-monitoring prototype. Contributions should move the project toward a reliable end-to-end path:
 
-`Motor/fan → Sensors → ESP32 → MQTT → Raspberry Pi → Preprocessing/features → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
+`Motor/fan → Sensors → ESP32 → MQTT → MacBook → Preprocessing/features → Edge-AI inference → Health logic → Digital Twin → Dashboard/alerts`
 
 Do not describe planned work as implemented or report estimated results as measurements.
 
@@ -14,6 +14,8 @@ Do not describe planned work as implemented or report estimated results as measu
 - Keep optional 3D, deep-learning, cloud, or RUL work behind the core pipeline.
 - Use the security policy for vulnerabilities; never disclose credentials publicly.
 - Confirm the safety plan before changing hardware or abnormal-condition experiments.
+
+For the complete GitHub review process, see [the draft and ready PR guide](docs/PR_GUIDE.md).
 
 ## Branch and Pull-Request Workflow
 
@@ -28,9 +30,9 @@ Do not describe planned work as implemented or report estimated results as measu
 ## Architecture Rules
 
 - The ESP32 owns sensor acquisition, basic validation/timestamping, telemetry packaging, Wi-Fi, and MQTT publishing.
-- The Raspberry Pi owns storage, signal preprocessing, feature extraction, live inference, health logic, Digital Twin state, dashboard services, and alerts.
+- The MacBook edge host owns storage, signal preprocessing, feature extraction, live inference, health logic, Digital Twin state, dashboard services, and alerts.
 - The core live path must operate locally without cloud inference.
-- Training may run on a development laptop, but exported preprocessing and feature definitions must match Raspberry Pi inference.
+- Training may run on a development laptop, but exported preprocessing and feature definitions must match MacBook inference.
 - Version 1 uses an operational Digital Twin; a 3D model is optional.
 - The project does not claim Remaining Useful Life from its short-duration experimental dataset.
 
@@ -58,17 +60,6 @@ Document every changed:
 - Store model metadata with the artifact: feature order, preprocessing version, labels, training commit, and dataset/run manifest.
 - Never fabricate performance, hardware behaviour, or validation outcomes.
 
-## Local Checks
-
-Run from the repository root after installing `requirements-dev.txt`:
-
-```bash
-python -m pytest -q
-python -m ruff check .
-```
-
-The existing tests verify documentation links and repository metadata. They do not verify physical hardware, sensor readings, model quality, or end-to-end behaviour. Add separate deterministic tests as each executable module is implemented.
-
 ## Code and Documentation Quality
 
 - Keep modules small and responsibilities explicit.
@@ -80,7 +71,7 @@ The existing tests verify documentation links and repository metadata. They do n
 
 ## Hardware and Experimental Safety
 
-- Keep motor power separate from ESP32 and Raspberry Pi power.
+- Keep motor power separate from ESP32 and motor power.
 - Never route motor current through a solderless breadboard.
 - Use a stable mount, rotating guard, fuse, master/emergency switch, insulated connections, and strain relief.
 - Secure any imbalance mass and operate within rated electrical, mechanical, and thermal limits.

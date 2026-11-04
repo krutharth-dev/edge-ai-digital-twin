@@ -48,8 +48,6 @@ Version 1 maintains live telemetry, inferred state, confidence, health state/sco
 
 The project dataset is intended for condition monitoring and fault/anomaly classification. It is not a run-to-failure degradation dataset and cannot support a validated Remaining Useful Life claim. An optional RUL demonstration must use a suitable public dataset and be reported separately.
 
-**Implication:** Use `UNKNOWN` when data or inference is unavailable; neither a model score nor a heuristic health score can stand in for validated life estimates.
-
 ## AD-008 — Run-Based Evaluation
 
 **Status:** Accepted
@@ -67,9 +65,3 @@ Use MQTT, Python, CSV, scikit-learn, and a lightweight dashboard first. Introduc
 **Status:** Accepted
 
 A guard, secure mounting, fuse, physical master/emergency switch, rated operation, and separate motor/control power are required. ML, MQTT, or dashboard behaviour must never be the only safety control.
-
-## AD-011 — Explicit Clock and Freshness Semantics
-
-**Status:** Accepted
-
-ESP32 uptime is not UTC time. Telemetry includes a boot/session identifier and an explicit clock-sync state, while the Raspberry Pi stores a separate receive timestamp. Stale, unsynchronized, or incompatible telemetry is handled using documented quality rules. These rules must be tested before the dashboard claims to show live health.

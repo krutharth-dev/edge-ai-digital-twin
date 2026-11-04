@@ -1,16 +1,18 @@
+<!-- Open a draft PR until implementation and tests are complete. Use Ready for review afterward. See docs/PR_GUIDE.md. -->
+
 ## Summary
 
 Describe what this pull request changes, why it is needed, and which project milestone it supports.
 
 ## Related Issue
 
-Closes #
+Issue link / number (or None):
 
 ## Affected Area
 
 - [ ] Motor rig, wiring, or safety
 - [ ] ESP32 firmware or sensors
-- [ ] MQTT or Raspberry Pi services
+- [ ] MQTT or Mac-hosted backend services
 - [ ] Dataset or storage
 - [ ] Feature extraction or machine learning
 - [ ] Digital Twin or health logic
@@ -21,16 +23,9 @@ Closes #
 
 List changed pin assignments, units, sample rates, MQTT topics/payloads, data columns, model features, configuration keys, or Digital Twin fields. Write "None" if no interface changed.
 
-## Change Type
-
-- [ ] Documentation or project setup
-- [ ] Implemented software or firmware
-- [ ] Hardware integration
-- [ ] Experimental protocol or measured results
-
 ## Validation Evidence
 
-List the exact commands, tests, controlled experiments, or manual checks performed and their results. For hardware work, describe only safe, repeatable tests. If the change is documentation-only, say so; do not claim that the scaffold tests validate physical hardware.
+List the commands, tests, controlled experiments, or manual checks performed and their results. For hardware work, describe only safe, repeatable tests.
 
 ## Data and ML Integrity
 
@@ -48,6 +43,6 @@ If hardware or abnormal-condition testing changed, identify the guard, power iso
 - [ ] I did not commit raw datasets, generated model binaries, local databases, or unrelated outputs.
 - [ ] Adjacent windows from one experimental run are not split across training and test data.
 - [ ] Unimplemented features and unmeasured results are clearly labelled as planned.
-- [ ] This change preserves local Raspberry Pi inference for the core system.
+- [ ] This change preserves local Mac-hosted inference and the MQTT contract.
 - [ ] Any physical test follows the repository safety plan.
 - [ ] I agree to follow the Code of Conduct.

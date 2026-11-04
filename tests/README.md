@@ -1,35 +1,33 @@
-# Testing
+# Testing and quality evidence
 
-**Status:** Planned scaffold; automated tests have not yet been committed.
+Automated Python tests and a broker-backed integration smoke test are committed. They test the **software MVP** only. Passing GitHub Actions does not validate hardware safety or physical motor fault classification.
 
-Testing follows [the project test plan](../docs/TEST_PLAN.md).
+## Local tests
 
-## Available Checks
-
-From the repository root, install the development dependencies and run:
-
-```bash
+~~~bash
+source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
-python -m ruff check .
-```
+python scripts/check_environment.py
+~~~
 
-`test_repository_quality.py` checks internal documentation file paths, the GitHub templates/workflow YAML, and the presence of the core design contracts. These are **scaffold checks only**, not proof that hardware, model inference, or the dashboard works.
+- [test_software_mvp.py](test_software_mvp.py): sensor JSON, features, twin state, SQLite and duplicates
+- [test_real_training.py](test_real_training.py): split by independent runs, not adjacent samples
+- [test_readme.py](test_readme.py): README links and Mac pull documentation
+- [test_repository_quality.py](test_repository_quality.py): docs links, YAML forms, workflows and .gitignore
 
-## Future Validation
+## End-to-end MQTT test
 
+The [smoke test](smoke_mqtt.py) launches the live service and publishers against a separate broker on port 18884 and writes to a disposable SQLite database.
 
-Planned categories:
+~~~bash
+# Start a test broker on port 18884 first.
+mosquitto -p 18884 -d
+python tests/smoke_mqtt.py --port 18884
+~~~
 
-- Sensor-driver and calibration checks
-- MQTT payload/schema contract tests
-- Raspberry Pi ingestion and stale-data tests
-- Deterministic feature-extraction unit tests
-- Training-to-inference feature parity tests
-- Run-split leakage checks
-- Model artifact/schema compatibility tests
-- Digital Twin transition and alert tests
-- Dashboard state/rendering checks
-- End-to-end hardware-in-the-loop demonstration records
+CI runs this test with a Linux Mosquitto installation. Your Mac demo uses the existing local broker on 1883 (see the [Mac runbook](../docs/MAC_RUNBOOK.md)).
 
-Tests that require physical hardware should be clearly marked and must follow the safety plan. Deterministic processing tests should use small synthetic fixtures rather than committed full experimental datasets.
+## Not yet physically validated
+
+Wokwi compilation and wiring, ESP32 Arduino compilation, current-sensor voltage scaling, NTP/real-time timestamps, physical fault data, held-out real-model metrics and the final guarded motor demonstration must be tested separately.

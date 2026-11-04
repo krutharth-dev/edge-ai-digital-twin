@@ -1,6 +1,4 @@
 -r requirements.txt
-
-# Repository checks and eventual Python unit tests
 pytest
 pytest-cov
 ruff

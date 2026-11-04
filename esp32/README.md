@@ -49,13 +49,6 @@ esp32/
 
 Pin assignments are intentionally not invented here. Add them only after the exact ESP32 board and wiring have been verified.
 
-## Timing and Electrical Integration
-
-- Verify voltage compatibility on **every sensor signal**. In particular, an ACS712 powered at 5 V can produce an output above the ESP32 ADC's safe input voltage; use an appropriately designed interface and never connect an out-of-range signal directly.
-- Keep sensor wiring, current measurement and motor switching within the approved [safety plan](../docs/SAFETY.md).
-- If network time is unavailable, do not label `millis()` uptime as Unix time. Publish an explicit unsynchronized state and let the Raspberry Pi record the receipt time.
-- Use a boot/session identifier with sequence numbers to handle device resets; test queue bounds and offline behaviour before claiming reliable transmission.
-
 ## Acceptance Evidence
 
 Firmware is ready for the next stage when real readings repeatedly reach Raspberry Pi storage with correct units, timestamps/sequences, quality flags, asset ID, and run ID, while disconnects and invalid reads are visible.

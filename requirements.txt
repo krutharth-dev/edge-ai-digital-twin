@@ -1,6 +1,5 @@
-# Candidate Python dependencies for the future edge service and offline ML tools.
-# Not a reproducible lock file; validate Raspberry Pi compatibility, then pin known-good versions.
-# Installing these packages does not install working project services.
+# Initial Raspberry Pi, data, ML, and dashboard stack.
+# Freeze exact working versions after the first validated Raspberry Pi setup.
 paho-mqtt
 python-dotenv
 numpy

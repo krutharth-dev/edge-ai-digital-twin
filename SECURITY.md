@@ -40,7 +40,7 @@ The core system is designed for a trusted local network, but local does not mean
 - Bind services only to the interfaces required for the experiment.
 - Use broker authentication and authorization when devices other than the project components can access the network.
 - Restrict publish/subscribe permissions by topic where practical.
-- Validate payload type, size, schema version, asset ID, clock validity, timestamp/freshness, and numeric ranges before storage or inference.
+- Validate payload type, size, schema version, asset ID, timestamp, and numeric ranges before storage or inference.
 - Treat unexpected or stale telemetry as invalid rather than silently updating the Digital Twin.
 - Avoid dashboard controls that can energize or alter the motor unless a separately reviewed safety mechanism exists.
 
@@ -51,12 +51,6 @@ The core system is designed for a trusted local network, but local does not mean
 - Record the expected model hash, feature schema, and source commit for deployed artifacts.
 - Sanitize file paths and reject oversized or malformed uploads.
 - Remove credentials and private metadata before sharing logs, screenshots, or datasets.
-
-## Secure MQTT Setup
-
-- Replace sample broker addresses with the actual trusted local-network endpoint before deployment.
-- Do not expose the unauthenticated MQTT port on an untrusted network; use broker authentication, topic ACLs, and transport protection appropriate to the deployment.
-- Do not treat an ESP32 timestamp of `0` or a device-uptime counter as a valid UTC timestamp. Until the clock is synchronized, use a clearly marked unsynchronized timestamp plus broker-side receipt time.
 
 ## Dependency Security
 

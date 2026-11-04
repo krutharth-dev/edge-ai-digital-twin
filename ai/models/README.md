@@ -14,9 +14,4 @@ For each locally stored model, keep a small metadata record containing:
 - Evaluation metrics and limitations
 - Raspberry Pi compatibility/latency check
 
-- Decision threshold or calibration method, if any; note when probabilities are not calibrated
-
-Metadata must distinguish the **trained model's prediction** from the subsequent rule-based health decision. A `joblib` file is executable deserialization input, not a neutral data file. Never load an artifact from an untrusted sender.
-
-
 Do not commit Joblib, pickle, ONNX, or TensorFlow Lite artifacts without explicit team approval and a clear size, license, provenance, and security review.

@@ -8,15 +8,6 @@ body:
     attributes:
       value: |
         Use this form before or after a controlled run. Do not include credentials, large raw datasets, or fabricated measurements.
-  - type: dropdown
-    attributes:
-      label: Record status
-      options:
-        - Planned - not performed
-        - Completed - measured evidence attached
-        - Interrupted or invalid - retained for traceability
-    validations:
-      required: true
   - type: input
     attributes:
       label: Objective
@@ -62,4 +53,4 @@ body:
   - type: textarea
     attributes:
       label: Result and limitations
-      description: Complete after the run. Link test/run IDs and measured evidence, separate observations from interpretation, and mark invalid/interrupted runs honestly.
+      description: Complete after the run. Separate measured results from interpretation and record invalid/interrupted runs honestly.

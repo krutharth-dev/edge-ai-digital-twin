@@ -36,12 +36,6 @@ Exact transitions and recovery rules must be based on collected baseline data an
 
 Inputs come from validated Raspberry Pi telemetry and inference services. Outputs feed the dashboard, alert history, and project demonstration. See [the architecture](../docs/ARCHITECTURE.md) and [test plan](../docs/TEST_PLAN.md).
 
-## State-Update Contract
-
-Each accepted update is associated with `asset_id`, a source/receipt timestamp, and message quality. Store the last valid reading separately from whether it is **currently fresh**. An unavailable model means `predicted_state = null`; an invalid or overdue sensor stream means `health_state = UNKNOWN` until an explicitly validated recovery rule applies.
-
-Sequence resets must be handled by publisher boot/session ID rather than treated as an impossible backward jump. See the [MQTT contract](../docs/MQTT_CONTRACT.md).
-
 ## Acceptance Evidence
 
 The twin is ready when safe physical changes update the correct asset automatically, stale/invalid data is visible, state history is traceable, alerts appear and clear according to documented rules, and the behaviour is repeatable.

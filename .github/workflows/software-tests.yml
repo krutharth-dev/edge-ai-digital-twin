@@ -1,0 +1,47 @@
+name: Software MVP tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: software-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit and repository quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+      - run: python scripts/check_environment.py
+      - run: python -m ruff check tests/test_repository_quality.py
+      - run: python -m compileall -q edge_ai_twin ai dashboard raspberry-pi simulator scripts
+
+  mqtt_integration:
+    name: Broker-backed end-to-end smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: python -m pip install -r requirements.txt
+      - name: Start local Mosquitto on isolated CI port
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y mosquitto
+          mosquitto -p 18884 -d
+      - name: Validate publisher to SQLite to Digital Twin alerts
+        run: python tests/smoke_mqtt.py --port 18884

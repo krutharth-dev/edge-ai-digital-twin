@@ -13,13 +13,6 @@
 
 See [the data-collection protocol](../docs/DATA_COLLECTION_PROTOCOL.md).
 
-## Dataset Checklist
-
-For each labelled run, keep the raw files unchanged and record `run_id`, `asset_id`, UTC or explicitly unsynchronized timestamps, class label, operating setting, hardware/firmware revision, sensor units and rates, and any interruptions. A small version-controlled manifest may point to locally stored recordings without exposing their contents.
-
-A training manifest should additionally record the run-level split, feature configuration, filtering decisions, source revision, and any excluded runs with reasons. Do not claim a dataset is reproducible when its run IDs or preprocessing configuration are missing.
-
-
 ## Suggested Local Layout
 
 ```text

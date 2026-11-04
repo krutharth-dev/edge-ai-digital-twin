@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "author": "Edge-AI Digital Twin Team",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 60,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu",
+      "top": -170,
+      "left": -230,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ds18b20",
+      "id": "temp",
+      "top": 190,
+      "left": -225,
+      "attrs": {
+        "temperature": "32"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "pullup",
+      "top": 150,
+      "left": -60,
+      "attrs": {
+        "value": "4700"
+      }
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "drv",
+      "top": -185,
+      "left": 345,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "motor",
+      "top": 195,
+      "left": 370,
+      "attrs": {
+        "size": "17"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:21",
+      "imu:SDA",
+      "green",
+      []
+    ],
+    [
+      "esp:22",
+      "imu:SCL",
+      "blue",
+      []
+    ],
+    [
+      "esp:3V3",
+      "imu:VCC",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "imu:GND",
+      "black",
+      []
+    ],
+    [
+      "esp:4",
+      "temp:DQ",
+      "green",
+      []
+    ],
+    [
+      "esp:3V3",
+      "temp:VCC",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "temp:GND",
+      "black",
+      []
+    ],
+    [
+      "esp:3V3",
+      "pullup:1",
+      "red",
+      []
+    ],
+    [
+      "pullup:2",
+      "temp:DQ",
+      "green",
+      []
+    ],
+    [
+      "esp:18",
+      "drv:STEP",
+      "green",
+      []
+    ],
+    [
+      "esp:19",
+      "drv:DIR",
+      "yellow",
+      []
+    ],
+    [
+      "esp:3V3",
+      "drv:VDD",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "drv:GND",
+      "black",
+      []
+    ],
+    [
+      "drv:RESET",
+      "drv:SLEEP",
+      "purple",
+      []
+    ],
+    [
+      "drv:1B",
+      "motor:B-",
+      "orange",
+      []
+    ],
+    [
+      "drv:1A",
+      "motor:B+",
+      "orange",
+      []
+    ],
+    [
+      "drv:2A",
+      "motor:A+",
+      "blue",
+      []
+    ],
+    [
+      "drv:2B",
+      "motor:A-",
+      "blue",
+      []
+    ]
+  ]
+}

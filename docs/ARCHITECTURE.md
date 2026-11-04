@@ -75,8 +75,6 @@ Version 1 is an operational state model, not a mandatory 3D simulation. Its mini
   "schema_version": 1,
   "asset_id": "MOTOR_01",
   "last_updated": null,
-  "clock_status": "UNKNOWN",
-  "last_receipt_ms": null,
   "telemetry": {
     "vibration": null,
     "temperature_c": null,
@@ -97,7 +95,7 @@ A dashboard visualizes this state but is not itself the complete Digital Twin.
 
 ## Required System Invariants
 
-- Every stored measurement has an asset ID, source timestamp **or explicit unsynchronized-clock marker**, Raspberry Pi receipt timestamp, unit, quality indicator, and traceable run/session.
+- Every stored measurement has an asset ID, timestamp, unit, quality indicator, and traceable run/session.
 - Sensor units and sampling settings are explicit.
 - Stale, malformed, or out-of-range telemetry cannot silently become a healthy state.
 - Training/test separation is performed by complete experimental run.
@@ -105,10 +103,6 @@ A dashboard visualizes this state but is not itself the complete Digital Twin.
 - Health and maintenance messages distinguish rule-based logic from model output.
 - No short-duration project dataset is presented as validated Remaining Useful Life evidence.
 - Physical safety controls do not depend on the dashboard, network, or ML model.
-
-## Clock and Freshness Boundary
-
-The ESP32 may start without an accurate wall clock. It must distinguish monotonic uptime from synchronized UTC time and include a boot identifier; the Raspberry Pi adds an ingestion timestamp. Sample order within a session can be established with uptime and sequence. Cross-device UTC comparisons must not assume that an unsynchronized clock is correct. Once freshness limits are measured, a stale stream updates the Digital Twin to an unknown/unavailable state rather than retaining a misleading healthy label.
 
 ## Failure Behaviour
 

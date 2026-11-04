@@ -43,10 +43,6 @@ Test:
 - Status/Last-Will behaviour
 - Storage continuity and explicit stale state
 
-### 4a. Clock, Ordering, and Recovery
-
-With a new ESP32 boot, verify the `boot_id` changes and sequence handling restarts correctly. Test synchronized UTC and unsynchronized uptime-only messages, out-of-order arrival, QoS 1 redelivery, and delayed retained health/status messages. Confirm the edge service uses its receipt timestamp when appropriate and refuses to show stale data as live.
-
 ### 5. Storage and Dataset Integrity
 
 Confirm raw data is immutable, filenames and schemas are consistent, run metadata is complete, interrupted runs are marked, and transformations can be reproduced from code/configuration.
@@ -96,4 +92,4 @@ Record sensor-to-dashboard latency and whether every expected state transition o
 
 ## Evidence Record
 
-Each validation record should include test ID, UTC date/time, operator, commit, hardware revision, configuration, run IDs, expected result, actual measured result, evidence path, pass/fail, and follow-up issue. Use `NOT RUN` rather than `PASS` for unexecuted tests. Keep physical safety sign-off separate from software test status.
+Each validation record should include test ID, date, operator, commit, hardware revision, configuration, run IDs, expected result, actual result, evidence path, pass/fail, and follow-up issue.
