@@ -2,8 +2,6 @@
 
 ## Status
 
-The **Mac** is the initial local edge host; a future Raspberry Pi deployment can use the same topic and payload contract. The demo publisher adds `synthetic: true` to explicitly identify non-physical data; such packets must not become real experiment evidence.
-
 This is the proposed Version 1 interface. Final rates, payload sizes, and QoS settings must be verified on the physical prototype before being marked stable.
 
 Base topic: `motor01`
@@ -12,13 +10,13 @@ Base topic: `motor01`
 
 | Topic | Publisher | Subscriber | Purpose |
 |---|---|---|---|
-| `motor01/vibration` | ESP32 | local edge host (Mac initially) | Timestamped ADXL345 samples or windows |
-| `motor01/temperature` | ESP32 | local edge host (Mac initially) | DS18B20 temperature reading |
-| `motor01/current` | ESP32 | local edge host (Mac initially) | ACS712 current reading or sample summary |
-| `motor01/rpm` | ESP32 | local edge host (Mac initially) | Hall-derived RPM |
-| `motor01/status` | ESP32 | local edge host (Mac initially)/dashboard | Device availability and acquisition health |
-| `motor01/health` | local edge host (Mac initially) | Digital Twin/dashboard | Inferred condition, health, confidence, and data quality |
-| `motor01/alerts` | local edge host (Mac initially) | Dashboard/operator service | New or cleared warnings and maintenance messages |
+| `motor01/vibration` | ESP32 | Raspberry Pi | Timestamped ADXL345 samples or windows |
+| `motor01/temperature` | ESP32 | Raspberry Pi | DS18B20 temperature reading |
+| `motor01/current` | ESP32 | Raspberry Pi | ACS712 current reading or sample summary |
+| `motor01/rpm` | ESP32 | Raspberry Pi | Hall-derived RPM |
+| `motor01/status` | ESP32 | Raspberry Pi/dashboard | Device availability and acquisition health |
+| `motor01/health` | Raspberry Pi | Digital Twin/dashboard | Inferred condition, health, confidence, and data quality |
+| `motor01/alerts` | Raspberry Pi | Dashboard/operator service | New or cleared warnings and maintenance messages |
 
 Only the listed owner should publish to a topic in the core design.
 
@@ -113,7 +111,7 @@ Rules:
 }
 ```
 
-The team may change raw vibration transport after measuring ESP32 memory, MQTT payload size, and achievable sample rate. Any change must be versioned and reflected in both firmware and local edge host (Mac initially) parsers.
+The team may change raw vibration transport after measuring ESP32 memory, MQTT payload size, and achievable sample rate. Any change must be versioned and reflected in both firmware and Raspberry Pi parsers.
 
 ## Health Payload
 
@@ -153,4 +151,4 @@ Final settings must be justified by packet loss, latency, duplicate handling, an
 
 ## Validation
 
-The local edge host (Mac initially) subscriber must check JSON validity, schema version, asset ID, required fields, types, ranges, units, freshness, sequence behaviour, and maximum payload size before storing or using a message for inference.
+The Raspberry Pi subscriber must check JSON validity, schema version, asset ID, required fields, types, ranges, units, freshness, sequence behaviour, and maximum payload size before storing or using a message for inference.

@@ -8,11 +8,11 @@ This file records accepted project decisions. A change that affects one of these
 
 Use a small, securely mounted 12 V DC motor/fan as the initial rotating-machine testbed. The prototype is designed to demonstrate the complete monitoring pipeline at low cost before any industrial-scale extension.
 
-## AD-002 — Split ESP32 and Local Edge Host Responsibilities
+## AD-002 — Split ESP32 and Raspberry Pi Responsibilities
 
 **Status:** Accepted
 
-The ESP32 performs sensor acquisition and MQTT communication. The **Intel Mac is the initial local edge host** for storage, preprocessing, feature extraction, local inference, health logic, Digital Twin services, and dashboard hosting. A Raspberry Pi is an optional later alternative; interfaces must remain hardware-neutral.
+The ESP32 performs sensor acquisition and MQTT communication. The Raspberry Pi performs storage, preprocessing, feature extraction, local inference, health logic, Digital Twin services, and dashboard hosting.
 
 **Reason:** This keeps real-time acquisition simple while placing heavier and more changeable software on the edge computer.
 
@@ -20,7 +20,7 @@ The ESP32 performs sensor acquisition and MQTT communication. The **Intel Mac is
 
 **Status:** Accepted
 
-Live inference must run **locally on the Intel Mac** for the first software and hardware prototype. Cloud processing is not required. A Raspberry Pi may later replace the Mac without changing the MQTT or ML input/output contracts.
+Live inference must run locally on the Raspberry Pi. Cloud processing is not required for the core system.
 
 ## AD-004 — Classical ML First
 
@@ -65,11 +65,3 @@ Use MQTT, Python, CSV, scikit-learn, and a lightweight dashboard first. Introduc
 **Status:** Accepted
 
 A guard, secure mounting, fuse, physical master/emergency switch, rated operation, and separate motor/control power are required. ML, MQTT, or dashboard behaviour must never be the only safety control.
-
-## AD-011 — Software-first Mac Development (October 2026)
-
-**Status:** Accepted for current development phase
-
-Establish the local Mosquitto → Python data path using **explicitly marked synthetic telemetry** before the physical rig is connected. Synthetic data are excluded from real experiment/model validation. Hardware, safety and sensor-calibration gates remain mandatory before collecting actual training data.
-
-See [Mac setup](SOFTWARE_SETUP_MAC.md) and [software-first workflow](WORKFLOWS.md).

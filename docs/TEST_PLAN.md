@@ -32,7 +32,7 @@ Do not integrate all sensors until each passes its individual test.
 
 Check timestamps, sequences, run ID, asset ID, units, quality flags, schema version, reconnect behaviour, and memory stability. Confirm invalid sensor reads are not replaced with normal-looking values.
 
-### 4. MQTT and local edge host (Mac initially) Ingestion
+### 4. MQTT and Raspberry Pi Ingestion
 
 Test:
 
@@ -49,7 +49,7 @@ Confirm raw data is immutable, filenames and schemas are consistent, run metadat
 
 ### 6. Feature Pipeline
 
-Use deterministic fixture data to test window boundaries, filtering, RMS, standard deviation, peak, peak-to-peak, kurtosis, crest factor, FFT frequency axis, dominant frequency, and band energy. Verify training and local edge host (Mac initially) implementations produce matching feature values and order.
+Use deterministic fixture data to test window boundaries, filtering, RMS, standard deviation, peak, peak-to-peak, kurtosis, crest factor, FFT frequency axis, dominant frequency, and band energy. Verify training and Raspberry Pi implementations produce matching feature values and order.
 
 ### 7. Machine Learning
 

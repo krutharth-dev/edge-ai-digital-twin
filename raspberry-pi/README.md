@@ -1,8 +1,6 @@
-# Raspberry Pi Edge Platform (Optional Later Deployment)
+# Raspberry Pi Edge Platform
 
-**Status:** Optional future deployment scaffold; edge-service code has not yet been committed.
-
-> The current software-first build runs these local MQTT/AI/Digital Twin roles on an **Intel Mac**. Follow [Mac setup](../docs/SOFTWARE_SETUP_MAC.md) first. This directory remains as a future Raspberry Pi porting guide.
+**Status:** Planned scaffold; edge-service code has not yet been committed.
 
 ## Responsibility
 
