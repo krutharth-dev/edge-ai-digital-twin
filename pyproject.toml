@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".venv", ".pio", "data/raw", "data/processed", "ai/models"]
+
+[tool.ruff.lint]
+# Initially enforce basic syntax and undefined names. Expand to style rules
+# once legacy application modules have been normalized.
+select = ["E4", "E7", "E9", "F"]
