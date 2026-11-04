@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   Activity, AlertTriangle, ArrowUpRight, BarChart3, Bell, CheckCircle2,
   CircleHelp, Cpu, Gauge, LayoutDashboard, Radio, RefreshCw, Thermometer,
@@ -109,7 +109,7 @@ function useDashboard() {
   }, []);
   const last = data.snapshot.last_updated_ms;
   const fresh = data.snapshot.is_fresh && typeof last === "number" && clock - last <= 12_000 && clock >= last;
-  const snapshot = fresh ? data.snapshot : { ...data.snapshot, health_state: "UNKNOWN" as Health, metrics: {}, health_score: null, predicted_state: null, confidence: null };
+  const snapshot: Snapshot = fresh ? data.snapshot : { ...data.snapshot, health_state: "UNKNOWN" as Health, metrics: {}, health_score: null, predicted_state: null, confidence: null };
   return { data, snapshot, connected, error, refresh };
 }
 export default function App() {
@@ -153,7 +153,7 @@ export default function App() {
             </section>
             <section className="panel status-panel">
               <div className="panel-title"><span><Activity size={17}/> SYSTEM HEALTH</span><span className="panel-tag">CURRENT</span></div>
-              <div className="health-content"><div className="score-ring" style={{"--ring-color": statusColor, "--ring-angle": ((snapshot.health_score ?? 0) * 3.6) + "deg"} as React.CSSProperties}><div><strong>{snapshot.health_score === null ? "—" : snapshot.health_score}</strong><small>HEALTH SCORE</small></div></div>
+              <div className="health-content"><div className="score-ring" style={{"--ring-color": statusColor, "--ring-angle": ((snapshot.health_score ?? 0) * 3.6) + "deg"} as CSSProperties}><div><strong>{snapshot.health_score === null ? "—" : snapshot.health_score}</strong><small>HEALTH SCORE</small></div></div>
               <h2 style={{color:statusColor}}>{state === "UNKNOWN" ? "Telemetry unavailable" : state === "HEALTHY" ? "Operating normally" : state === "WARNING" ? "Attention required" : "Fault detected"}</h2><p>{snapshot.message}</p></div>
               <div className="status-stats"><div><span>DATA SOURCE</span><strong>{snapshot.source || "UNKNOWN"}</strong></div><div><span>LAST SEEN</span><strong>{timeLabel(snapshot.last_updated_ms)}</strong></div></div>
             </section>
