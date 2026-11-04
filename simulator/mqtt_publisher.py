@@ -31,6 +31,8 @@ def main():
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
         client_id=f"motor01_demo_{run_id[-12:]}",
     )
+    if os.getenv("MQTT_USERNAME"):
+        client.username_pw_set(os.environ["MQTT_USERNAME"], os.getenv("MQTT_PASSWORD", ""))
     def status(value):
         return json.dumps({
             "schema_version": 1, "asset_id": "MOTOR_01",
