@@ -5,6 +5,7 @@ publisher -> MQTT broker -> live service -> SQLite sensor/twin/alert rows.
 It uses a disposable database and never interferes with data/motor_readings.db.
 """
 import argparse
+import select
 import sqlite3
 import subprocess
 import sys
@@ -23,12 +24,26 @@ def main(port):
             "--host", "127.0.0.1", "--port", str(port), "--database", str(db_path),
         ]
         receiver = subprocess.Popen(
-            command, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
+            command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, bufsize=1
         )
         try:
-            time.sleep(1.5)
-            if receiver.poll() is not None:
-                raise RuntimeError("Live service exited immediately")
+            # Wait for a confirmed MQTT subscription rather than guessing that
+            # the receiver is ready after an arbitrary 1.5-second sleep.
+            # Otherwise the first QoS 0 batch can be lost on slower CI runners.
+            assert receiver.stdout is not None
+            deadline = time.monotonic() + 12
+            while time.monotonic() < deadline:
+                if receiver.poll() is not None:
+                    raise RuntimeError("Live service exited before MQTT subscription")
+                readable, _, _ = select.select([receiver.stdout], [], [], 0.5)
+                if readable:
+                    line = receiver.stdout.readline()
+                    if "CONNECTED; listening to motor01 sensor telemetry" in line:
+                        break
+            else:
+                raise RuntimeError("Timed out waiting for live-service MQTT subscription")
+            time.sleep(0.2)
             for scenario in ("normal", "overload"):
                 publisher = subprocess.run(
                     [
