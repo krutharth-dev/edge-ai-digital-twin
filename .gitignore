@@ -50,3 +50,6 @@ Thumbs.db
 # Build output
 build/
 dist/
+
+# ESP32 integration branch local Wi-Fi and MQTT credentials
+esp32/live-mqtt/**/secrets.h
