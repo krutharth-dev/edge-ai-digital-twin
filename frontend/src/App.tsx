@@ -15,8 +15,9 @@ type Snapshot = {
   model_version?: string | null; model_data_type?: string | null;
 };
 type Reading = { time_ms: number; sensor: Sensor; value: number; source: string };
+type SensorDiagnostic = { quality: string; is_fresh: boolean; value: number | null; source: string | null; last_updated_ms: number | null };
 type Alert = { timestamp_ms: number; previous_state: string; new_state: string; message: string; source: string | null };
-type Dashboard = { server_time_ms: number; asset_id: string; snapshot: Snapshot; history: Reading[]; alerts: Alert[] };
+type Dashboard = { server_time_ms: number; asset_id: string; snapshot: Snapshot; sensors?: Partial<Record<Sensor, SensorDiagnostic>>; history: Reading[]; alerts: Alert[] };
 type View = "overview" | "telemetry" | "alerts";
 
 const EMPTY: Dashboard = {
@@ -58,6 +59,21 @@ function timeLabel(ms: number | null) {
   if (!ms) return "No telemetry yet";
   return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
+
+function sensorStatusText(sensor?: SensorDiagnostic) {
+  if (!sensor || sensor.quality === "MISSING") return "MISSING";
+  const age = Date.now() - (sensor.last_updated_ms ?? 0);
+  if (!sensor.is_fresh || age < 0 || age > 12_000) return "STALE / OFFLINE";
+  return sensor.quality + " / " + (sensor.source ?? "UNKNOWN");
+}
+function displayedSensorValue(sensorName: Sensor, metric: keyof Snapshot["metrics"], data: Dashboard, snapshot: Snapshot) {
+  const sensor = data.sensors?.[sensorName];
+  if (!sensor) return snapshot.metrics[metric]; // compatibility with older API
+  const age = Date.now() - (sensor.last_updated_ms ?? 0);
+  if (!sensor.is_fresh || age < 0 || age > 12_000 || sensor.quality !== "VALID") return undefined;
+  return typeof sensor.value === "number" ? sensor.value : undefined;
+}
+
 function useDashboard() {
   const [data, setData] = useState<Dashboard>(EMPTY);
   const [connected, setConnected] = useState(false);
@@ -129,7 +145,7 @@ export default function App() {
         <button className={"nav-item " + (view === "telemetry" ? "active" : "")} onClick={() => setView("telemetry")}><BarChart3 size={18} /> Telemetry</button>
         <button className={"nav-item " + (view === "alerts" ? "active" : "")} onClick={() => setView("alerts")}><Bell size={18} /> Alerts <span className="nav-count">{data.alerts.length}</span></button>
       </nav>
-      <div className="sidebar-bottom"><div className="asset-mini"><span className="asset-dot" /> MOTOR_01 <span>ACTIVE ASSET</span></div><p>Local simulation environment<br/>Academic prototype · v0.1</p></div>
+      <div className="sidebar-bottom"><div className="asset-mini"><span className="asset-dot" /> MOTOR_01 <span>ACTIVE ASSET</span></div><p>Local edge monitoring environment<br/>Academic prototype · v0.1</p></div>
     </aside>
     <main className="main">
       <header className="topbar"><div className="crumb">Workspace <span>/</span> Motor monitoring <span>/</span> <b>{view === "overview" ? "Overview" : view === "telemetry" ? "Telemetry" : "Alerts"}</b></div>
@@ -137,7 +153,7 @@ export default function App() {
       </header>
       <div className="page">
         <div className="heading"><div><p className="eyebrow">MACHINE INTELLIGENCE / LIVE OVERVIEW</p><h1>{view === "overview" ? "Digital Twin Command Center" : view === "telemetry" ? "Sensor Telemetry" : "Maintenance Alerts"}</h1><p className="subheading">Motor 01 <span>·</span> Condition monitoring and predictive-maintenance research</p></div><div className="live-pill"><span className="pulse-dot"/> LOCAL ENVIRONMENT</div></div>
-        <div className="notice"><CircleHelp size={18}/><span><strong>SIMULATION / ACADEMIC USE.</strong> Thresholds and model predictions are illustrative, not validated equipment protection or real-world fault accuracy.</span></div>
+        <div className="notice"><CircleHelp size={18}/><span><strong>ACADEMIC PROTOTYPE.</strong> Thresholds and model predictions are illustrative, not validated equipment protection or real-world fault accuracy.</span></div>
         {error && <div className="api-error"><AlertTriangle size={17}/>{error}. Start the FastAPI service on port 8000.</div>}
         {view === "overview" && <>
           <div className="hero-grid">
@@ -159,12 +175,12 @@ export default function App() {
             </section>
           </div>
           <div className="section-header"><h2>Live Sensor Readings</h2><span>Four monitored parameters <ArrowUpRight size={15}/></span></div>
-          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">SENSOR / {m.sensor.toUpperCase()}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(snapshot.metrics[m.key],m.sensor)} <span>{m.unit}</span></div><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
+          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">{sensorStatusText(data.sensors?.[m.sensor])}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
           <div className="bottom-grid"><section className="panel detail-panel"><div className="panel-title"><span><Cpu size={17}/> AI INFERENCE</span><span className="panel-tag">OPTIONAL MODEL</span></div><div className="ai-inference">{snapshot.predicted_state ? <><div className="ai-value">{snapshot.predicted_state}</div><p>Classifier probability: {snapshot.confidence == null ? "Not available" : (snapshot.confidence*100).toFixed(1)+"%"} · Not calibrated</p><small>{snapshot.model_version ?? "Unversioned"} · {snapshot.model_data_type ?? "Unverified data"}</small></> : <><div className="ai-placeholder"><Cpu size={30}/></div><h3>Rule-based monitoring active</h3><p>No optional ML inference loaded. Run the trusted local demo model to see predictions.</p></>}</div></section><section className="panel detail-panel"><div className="panel-title"><span><Bell size={17}/> RECENT EVENTS</span><button className="text-action" onClick={()=>setView("alerts")}>View all <ArrowUpRight size={14}/></button></div><div className="events-list">{data.alerts.length===0?<p className="empty-state">No state-transition alerts recorded yet.</p>:data.alerts.slice(0,3).map((a,i)=><div className="event-row" key={String(a.timestamp_ms)+i}><span className="event-icon"><AlertTriangle size={17}/></span><div><strong>{a.previous_state} → {a.new_state}</strong><p>{a.message}</p></div><time>{timeLabel(a.timestamp_ms)}</time></div>)}</div></section></div>
         </>}
-        {view === "telemetry" && <div className="telemetry-grid">{METRICS.map(m=>{const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel telemetry-panel" key={m.sensor}><div className="panel-title"><span><Icon size={17}/>{m.title}</span><span className="panel-tag">{m.unit}</span></div><div className="telemetry-number">{formatValue(snapshot.metrics[m.key],m.sensor)} <span>{m.unit}</span></div><Sparkline height={175} values={readings.map(r=>r.value)} color={m.color}/><p>Historical readings · {readings.length} recent samples · {readings[readings.length-1]?.source ?? "—"}</p></article>;})}</div>}
-        {view === "alerts" && <section className="panel alerts-panel"><div className="panel-title"><span><Bell size={17}/> STATE TRANSITION HISTORY</span><span className="panel-tag">{data.alerts.length} EVENTS</span></div>{data.alerts.length ? <div className="alerts-table"><div className="alerts-header"><span>TRANSITION</span><span>DETAIL</span><span>SOURCE</span><span>TIME</span></div>{data.alerts.map((a,i)=><div className="alerts-line" key={String(a.timestamp_ms)+i}><span><AlertTriangle size={16}/> {a.previous_state} → {a.new_state}</span><span>{a.message}</span><span>{a.source || "UNKNOWN"}</span><time>{new Date(a.timestamp_ms).toLocaleString()}</time></div>)}</div>:<div className="empty-large"><CheckCircle2 size={34}/><h3>No transitions recorded</h3><p>Start the simulated MQTT scenarios to generate alert history.</p></div>}</section>}
-        <footer className="footer">EDGE AI DIGITAL TWIN <span>·</span> MOTOR_01 <span>·</span> LOCAL READ-ONLY DASHBOARD <span>·</span> SYNTHETIC DATA NOT VALIDATED</footer>
+        {view === "telemetry" && <div className="telemetry-grid">{METRICS.map(m=>{const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel telemetry-panel" key={m.sensor}><div className="panel-title"><span><Icon size={17}/>{m.title}</span><span className="panel-tag">{sensorStatusText(data.sensors?.[m.sensor])} · {m.unit}</span></div><div className="telemetry-number">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><Sparkline height={175} values={readings.map(r=>r.value)} color={m.color}/><p>Historical readings · {readings.length} recent samples · {readings[readings.length-1]?.source ?? "—"}</p></article>;})}</div>}
+        {view === "alerts" && <section className="panel alerts-panel"><div className="panel-title"><span><Bell size={17}/> STATE TRANSITION HISTORY</span><span className="panel-tag">{data.alerts.length} EVENTS</span></div>{data.alerts.length ? <div className="alerts-table"><div className="alerts-header"><span>TRANSITION</span><span>DETAIL</span><span>SOURCE</span><span>TIME</span></div>{data.alerts.map((a,i)=><div className="alerts-line" key={String(a.timestamp_ms)+i}><span><AlertTriangle size={16}/> {a.previous_state} → {a.new_state}</span><span>{a.message}</span><span>{a.source || "UNKNOWN"}</span><time>{new Date(a.timestamp_ms).toLocaleString()}</time></div>)}</div>:<div className="empty-large"><CheckCircle2 size={34}/><h3>No transitions recorded</h3><p>Connect verified sensors or run the simulator to generate condition history.</p></div>}</section>}
+        <footer className="footer">EDGE AI DIGITAL TWIN <span>·</span> MOTOR_01 <span>·</span> LOCAL READ-ONLY DASHBOARD <span>·</span> REAL SENSOR ACCURACY NOT YET VALIDATED</footer>
       </div>
     </main>
   </div>;

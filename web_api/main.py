@@ -125,6 +125,54 @@ def measurements() -> list[dict]:
     return output[-400:]
 
 
+
+def individual_sensors(now: int) -> dict:
+    """Latest independently validated sensor availability, even if whole twin is UNKNOWN.
+
+    Quality flags and freshness are explicit. Do not show uncalibrated/stale
+    readings as live numbers, or turn a partial sensor set into healthy status.
+    """
+    output = {
+        sensor: {
+            "quality": "MISSING", "is_fresh": False, "value": None,
+            "source": None, "last_updated_ms": None,
+        }
+        for sensor in sorted(TOPICS)
+    }
+    rows = select_rows(
+        """SELECT s.topic, s.timestamp_ms, s.quality, s.source, s.payload_json
+        FROM sensor_readings AS s
+        JOIN (SELECT topic, MAX(id) AS newest_id
+              FROM sensor_readings GROUP BY topic) AS last
+        ON s.id = last.newest_id"""
+    )
+    for row in rows:
+        sensor = row["topic"].rsplit("/", 1)[-1]
+        if sensor not in output:
+            continue
+        ts = row["timestamp_ms"]
+        fresh = type(ts) is int and 0 <= now - ts <= FRESHNESS_MS
+        value = None
+        if fresh and row["quality"] == "VALID":
+            try:
+                payload = json.loads(row["payload_json"])
+                numeric = (
+                    vibration_features(payload)["vibration_rms_g"]
+                    if sensor == "vibration" else payload["value"]
+                )
+                value = float(numeric)
+            except (ValueError, TypeError, KeyError, json.JSONDecodeError):
+                pass
+        output[sensor] = {
+            "quality": row["quality"],
+            "is_fresh": fresh,
+            "value": value,
+            "source": row["source"] or "UNKNOWN",
+            "last_updated_ms": ts,
+        }
+    return output
+
+
 def dashboard_data() -> dict:
     now = now_ms()
     alerts = select_rows(
@@ -135,6 +183,7 @@ def dashboard_data() -> dict:
         "server_time_ms": now,
         "asset_id": "MOTOR_01",
         "snapshot": latest_snapshot(now),
+        "sensors": individual_sensors(now),
         "history": measurements(),
         "alerts": alerts,
     }
