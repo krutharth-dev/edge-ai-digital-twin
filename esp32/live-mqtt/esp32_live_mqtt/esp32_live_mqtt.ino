@@ -57,7 +57,6 @@ uint32_t previousCycleMs = 0;
 uint32_t lastWifiAttemptMs = 0;
 uint32_t lastMqttAttemptMs = 0;
 uint32_t lastClockNoticeMs = 0;
-uint32_t lastWifiNoticeMs = 0;
 uint32_t sequence = 0;
 bool adxlReady = false;
 bool dsReady = false;
@@ -159,7 +158,8 @@ void setup() {
   bootId = String((uint32_t)ESP.getEfuseMac(), HEX) + "-" + String(millis());
 
   Wire.begin(I2C_SDA, I2C_SCL);
-  adxlReady = adxl.begin();
+  // Boards can strap ADXL345 ADDR/SDO to either supported I2C address.
+  adxlReady = adxl.begin(0x53) || adxl.begin(0x1D);
   if (adxlReady) adxl.setRange(ADXL345_RANGE_2_G);
   ds18.begin();
   dsReady = ds18.getDeviceCount() > 0;

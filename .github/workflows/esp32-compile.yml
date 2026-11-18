@@ -1,0 +1,46 @@
+name: ESP32 sensor sketches compile
+on:
+  pull_request:
+    paths:
+      - 'esp32/**'
+      - '.github/workflows/esp32-compile.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'esp32/**'
+      - '.github/workflows/esp32-compile.yml'
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install ESP32 Arduino board core
+        run: |
+          arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core install esp32:esp32 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+      - name: Install sensor + MQTT libraries
+        run: |
+          arduino-cli lib install "PubSubClient"
+          arduino-cli lib install "ArduinoJson"
+          arduino-cli lib install "Adafruit ADXL345"
+          arduino-cli lib install "Adafruit Unified Sensor"
+          arduino-cli lib install "Adafruit BusIO"
+          arduino-cli lib install "OneWire"
+          arduino-cli lib install "DallasTemperature"
+      - name: Compile integrated MQTT firmware (dummy CI-only secrets)
+        run: |
+          cp esp32/live-mqtt/esp32_live_mqtt/secrets.example.h esp32/live-mqtt/esp32_live_mqtt/secrets.h
+          arduino-cli compile --fqbn esp32:esp32:esp32 esp32/live-mqtt/esp32_live_mqtt
+          rm -f esp32/live-mqtt/esp32_live_mqtt/secrets.h
+      - name: Compile all four independent sensor diagnostic sketches
+        run: |
+          set -eu
+          for sketch in esp32/sensor-tests/*_test; do
+            echo "Compiling $sketch"
+            arduino-cli compile --fqbn esp32:esp32:esp32 "$sketch"
+          done
