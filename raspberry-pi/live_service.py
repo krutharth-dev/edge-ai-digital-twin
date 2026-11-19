@@ -120,6 +120,15 @@ class LiveService:
         try:
             while True:
                 time.sleep(2)
+                status_file = os.getenv("EDGE_AI_RECEIVER_STATUS")
+                if status_file:
+                    target = Path(status_file)
+                    pending = target.with_suffix(".tmp")
+                    pending.write_text(json.dumps({
+                        "timestamp_ms": int(time.time() * 1000),
+                        "mqtt_connected": self.client.is_connected(),
+                    }))
+                    pending.replace(target)
                 previous = self.twin.health_state
                 changed = self.twin.evaluate()
                 if changed:

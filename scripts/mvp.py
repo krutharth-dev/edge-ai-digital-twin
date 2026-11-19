@@ -71,6 +71,8 @@ def start():
                     sys.exit("Configure authenticated Mosquitto per docs/ESP32_REACT_LIVE_SETUP.md")
                 launch("broker", [shutil.which("mosquitto") or "/opt/local/sbin/mosquitto", "-c", config])
                 wait_port(port)
+            os.environ["EDGE_AI_RECEIVER_STATUS"] = str(STATE / "receiver-status.json")
+            Path(os.environ["EDGE_AI_RECEIVER_STATUS"]).unlink(missing_ok=True)
             os.environ.setdefault("EDGE_AI_DB_PATH", str(ROOT / "data/physical_mvp.db"))
             env = dict(os.environ, EDGE_AI_PHYSICAL_ONLY="1", MQTT_HOST="127.0.0.1", MQTT_PORT=str(port))
             env.setdefault("MQTT_USERNAME", "motor01")

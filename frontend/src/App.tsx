@@ -17,7 +17,7 @@ type Snapshot = {
 type Reading = { time_ms: number; sensor: Sensor; value: number; source: string };
 type SensorDiagnostic = { sequence?: number; boot_id?: string; diagnostics?: {adc_voltage_v?: number; pulse_count?: number; measurement_interval_ms?: number; sensor_status?: string}; quality: string; is_fresh: boolean; value: number | null; source: string | null; last_updated_ms: number | null };
 type Alert = { timestamp_ms: number; previous_state: string; new_state: string; message: string; source: string | null };
-type Dashboard = { server_time_ms: number; asset_id: string; snapshot: Snapshot; sensors?: Partial<Record<Sensor, SensorDiagnostic>>; history: Reading[]; alerts: Alert[] };
+type Dashboard = { mqtt_status?: string; server_time_ms: number; asset_id: string; snapshot: Snapshot; sensors?: Partial<Record<Sensor, SensorDiagnostic>>; history: Reading[]; alerts: Alert[] };
 type View = "overview" | "telemetry" | "alerts";
 
 const EMPTY: Dashboard = {
@@ -144,6 +144,8 @@ export default function App() {
     m.sensor, data.history.filter(item => item.sensor === m.sensor).slice(-65),
   ])) as Record<Sensor, Reading[]>, [data.history]);
   const state = snapshot.health_state;
+  const latestPacket = Math.max(0, ...Object.values(data.sensors ?? {}).map(s => s?.last_updated_ms ?? 0));
+  const ageSeconds = Math.floor((Date.now() - latestPacket) / 1000);
   const statusColor = STATE_COLOR[state];
   return <div className="app">
     <aside className="sidebar">
@@ -158,7 +160,7 @@ export default function App() {
     </aside>
     <main className="main">
       <header className="topbar"><div className="crumb">Workspace <span>/</span> Motor monitoring <span>/</span> <b>{view === "overview" ? "Overview" : view === "telemetry" ? "Telemetry" : "Alerts"}</b></div>
-        <div className="top-actions"><span className={"connection " + (connected ? "connected" : "")}><Radio size={15} /> {connected ? "Live connection" : "Reconnecting"}</span><button className="icon-button" onClick={() => void refresh()} title="Refresh dashboard" aria-label="Refresh dashboard"><RefreshCw size={17} /></button></div>
+        <div className="top-actions"><small>MQTT {connected ? (data.mqtt_status ?? "UNKNOWN") : "UNKNOWN"} · ESP32 {latestPacket && ageSeconds >= 0 ? (ageSeconds <= 12 ? "receiving" : "stale") + " · " + ageSeconds + "s ago" : "awaiting data"}</small><span className={"connection " + (connected ? "connected" : "")}><Radio size={15} /> {connected ? "Dashboard connected" : "Reconnecting"}</span><button className="icon-button" onClick={() => void refresh()} title="Refresh dashboard" aria-label="Refresh dashboard"><RefreshCw size={17} /></button></div>
       </header>
       <div className="page">
         <div className="heading"><div><p className="eyebrow">MACHINE INTELLIGENCE / LIVE OVERVIEW</p><h1>{view === "overview" ? "Digital Twin Command Center" : view === "telemetry" ? "Sensor Telemetry" : "Maintenance Alerts"}</h1><p className="subheading">Motor 01 <span>·</span> Condition monitoring and predictive-maintenance research</p></div><div className="live-pill"><span className="pulse-dot"/> LOCAL ENVIRONMENT</div></div>

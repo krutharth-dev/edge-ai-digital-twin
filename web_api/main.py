@@ -181,6 +181,19 @@ def individual_sensors(now: int) -> dict:
     return output
 
 
+def receiver_status(now: int):
+    path = os.getenv("EDGE_AI_RECEIVER_STATUS")
+    if path:
+        try:
+            record = json.loads(Path(path).read_text())
+            if 0 <= now - record["timestamp_ms"] < 7000:
+                return "CONNECTED" if record["mqtt_connected"] else "DISCONNECTED"
+            return "OFFLINE"
+        except (OSError, ValueError, TypeError, KeyError):
+            pass
+    return "UNKNOWN"
+
+
 def dashboard_data() -> dict:
     now = now_ms()
     alerts = select_rows(
@@ -189,6 +202,7 @@ def dashboard_data() -> dict:
     )
     return {
         "server_time_ms": now,
+        "mqtt_status": receiver_status(now),
         "asset_id": "MOTOR_01",
         "snapshot": latest_snapshot(now),
         "sensors": individual_sensors(now),
