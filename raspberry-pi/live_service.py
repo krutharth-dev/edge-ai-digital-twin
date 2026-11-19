@@ -105,6 +105,8 @@ class LiveService:
             return
         try:
             payload = json.loads(message.payload.decode("utf-8"))
+            if os.getenv("EDGE_AI_PHYSICAL_ONLY") == "1" and isinstance(payload, dict) and payload.get("source") != "PHYSICAL":
+                return
             snapshot = self.process(message.topic, payload)
         except (ValueError, TypeError, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             print(f"Rejected {message.topic}: {exc}", flush=True)
@@ -112,12 +114,21 @@ class LiveService:
         print(f"{message.topic}: {snapshot['health_state']} / {snapshot['message']}", flush=True)
 
     def run(self):
-        self.client.connect(self.broker, self.port, keepalive=60)
+        self.client.connect_async(self.broker, self.port, keepalive=60)
         self.client.loop_start()
         last_state = self.twin.health_state
         try:
             while True:
                 time.sleep(2)
+                status_file = os.getenv("EDGE_AI_RECEIVER_STATUS")
+                if status_file:
+                    target = Path(status_file)
+                    pending = target.with_suffix(".tmp")
+                    pending.write_text(json.dumps({
+                        "timestamp_ms": int(time.time() * 1000),
+                        "mqtt_connected": self.client.is_connected(),
+                    }))
+                    pending.replace(target)
                 previous = self.twin.health_state
                 changed = self.twin.evaluate()
                 if changed:
