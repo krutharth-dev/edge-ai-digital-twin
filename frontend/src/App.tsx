@@ -51,9 +51,8 @@ function Sparkline({ values, color, height = 58 }: { values: number[]; color: st
     <polyline fill="none" stroke={color} strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round" points={points} vectorEffect="non-scaling-stroke" />
   </svg>;
 }
-function formatValue(value: number | undefined, sensor: Sensor) {
-  if (value === undefined || value === null) return "—";
-  return sensor === "rpm" ? value.toFixed(0) : sensor === "temperature" ? String(value) : value.toFixed(3);
+function formatValue(value: number | undefined) {
+  return typeof value === "number" && Number.isFinite(value) ? String(value) : "—";
 }
 function timeLabel(ms: number | null) {
   if (!ms) return "No telemetry yet";
@@ -68,23 +67,24 @@ function SensorDetails({sensor}: {sensor?: SensorDiagnostic}) {
     {d?.pulse_count != null && <p>{d.pulse_count} pulses in {d.measurement_interval_ms} ms</p>}
   </div>;
 }
-function sensorStatusText(sensor?: SensorDiagnostic) {
+function sensorStatusText(sensor: SensorDiagnostic | undefined, clock: number) {
   if (!sensor || sensor.quality === "MISSING") return "MISSING";
-  const age = Date.now() - (sensor.last_updated_ms ?? 0);
+  const age = clock - (sensor.last_updated_ms ?? 0);
   if (!sensor.is_fresh || age < 0 || age > 12_000) return "STALE / OFFLINE";
   if (sensor.diagnostics?.sensor_status === "SENSOR_DISCONNECTED") return "DISCONNECTED";
   return sensor.quality + " / " + (sensor.source ?? "UNKNOWN");
 }
-function displayedSensorValue(sensorName: Sensor, metric: keyof Snapshot["metrics"], data: Dashboard, snapshot: Snapshot) {
+function displayedSensorValue(sensorName: Sensor, data: Dashboard, clock: number) {
   const sensor = data.sensors?.[sensorName];
-  if (!sensor) return snapshot.metrics[metric]; // compatibility with older API
-  const age = Date.now() - (sensor.last_updated_ms ?? 0);
+  if (!sensor || sensor.source !== "PHYSICAL") return undefined;
+  const age = clock - (sensor.last_updated_ms ?? 0);
   if (!sensor.is_fresh || age < 0 || age > 12_000 || sensor.quality !== "VALID") return undefined;
   return typeof sensor.value === "number" ? sensor.value : undefined;
 }
 
 function useDashboard() {
-  const [data, setData] = useState<Dashboard>(EMPTY);
+  const [{data, received}, setFrame] = useState({data: EMPTY, received: performance.now()});
+  const setData = useCallback((data: Dashboard) => setFrame({data, received: performance.now()}), []);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const refresh = useCallback(async () => {
@@ -97,7 +97,7 @@ function useDashboard() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "API unavailable");
     }
-  }, []);
+  }, [setData]);
   useEffect(() => {
     let socket: WebSocket | undefined;
     let retry: ReturnType<typeof setTimeout> | undefined;
@@ -125,27 +125,28 @@ function useDashboard() {
       if (retry) clearTimeout(retry);
       socket?.close();
     };
-  }, [refresh]);
+  }, [refresh, setData]);
   // Backend time is authoritative for freshness; force UI stale if stream stops.
-  const [clock, setClock] = useState(Date.now());
+  const [tick, setTick] = useState(performance.now());
+  const clock = data.server_time_ms + Math.max(0, tick - received);
   useEffect(() => {
-    const timer = setInterval(() => setClock(Date.now()), 1000);
+    const timer = setInterval(() => setTick(performance.now()), 1000);
     return () => clearInterval(timer);
   }, []);
   const last = data.snapshot.last_updated_ms;
   const fresh = data.snapshot.is_fresh && typeof last === "number" && clock - last <= 12_000 && clock >= last;
   const snapshot: Snapshot = fresh ? data.snapshot : { ...data.snapshot, health_state: "UNKNOWN" as Health, metrics: {}, health_score: null, predicted_state: null, confidence: null };
-  return { data, snapshot, connected, error, refresh };
+  return { data, snapshot, connected, error, refresh, clock };
 }
 export default function App() {
-  const { data, snapshot, connected, error, refresh } = useDashboard();
+  const { data, snapshot, connected, error, refresh, clock } = useDashboard();
   const [view, setView] = useState<View>("overview");
   const recent = useMemo(() => Object.fromEntries(METRICS.map(m => [
     m.sensor, data.history.filter(item => item.sensor === m.sensor).slice(-65),
   ])) as Record<Sensor, Reading[]>, [data.history]);
   const state = snapshot.health_state;
   const latestPacket = Math.max(0, ...Object.values(data.sensors ?? {}).map(s => s?.last_updated_ms ?? 0));
-  const ageSeconds = Math.floor((Date.now() - latestPacket) / 1000);
+  const ageSeconds = Math.floor((clock - latestPacket) / 1000);
   const statusColor = STATE_COLOR[state];
   return <div className="app">
     <aside className="sidebar">
@@ -186,10 +187,10 @@ export default function App() {
             </section>
           </div>
           <div className="section-header"><h2>Live Sensor Readings</h2><span>Four monitored parameters <ArrowUpRight size={15}/></span></div>
-          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">{sensorStatusText(data.sensors?.[m.sensor])}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><SensorDetails sensor={data.sensors?.[m.sensor]}/><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
+          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">{sensorStatusText(data.sensors?.[m.sensor], clock)}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(displayedSensorValue(m.sensor,data,clock))} <span>{m.unit}</span></div><SensorDetails sensor={data.sensors?.[m.sensor]}/><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
           <div className="bottom-grid"><section className="panel detail-panel"><div className="panel-title"><span><Cpu size={17}/> AI INFERENCE</span><span className="panel-tag">OPTIONAL MODEL</span></div><div className="ai-inference">{snapshot.predicted_state ? <><div className="ai-value">{snapshot.predicted_state}</div><p>Classifier probability: {snapshot.confidence == null ? "Not available" : (snapshot.confidence*100).toFixed(1)+"%"} · Not calibrated</p><small>{snapshot.model_version ?? "Unversioned"} · {snapshot.model_data_type ?? "Unverified data"}</small></> : <><div className="ai-placeholder"><Cpu size={30}/></div><h3>Rule-based monitoring active</h3><p>No optional ML inference loaded. Run the trusted local demo model to see predictions.</p></>}</div></section><section className="panel detail-panel"><div className="panel-title"><span><Bell size={17}/> RECENT EVENTS</span><button className="text-action" onClick={()=>setView("alerts")}>View all <ArrowUpRight size={14}/></button></div><div className="events-list">{data.alerts.length===0?<p className="empty-state">No state-transition alerts recorded yet.</p>:data.alerts.slice(0,3).map((a,i)=><div className="event-row" key={String(a.timestamp_ms)+i}><span className="event-icon"><AlertTriangle size={17}/></span><div><strong>{a.previous_state} → {a.new_state}</strong><p>{a.message}</p></div><time>{timeLabel(a.timestamp_ms)}</time></div>)}</div></section></div>
         </>}
-        {view === "telemetry" && <div className="telemetry-grid">{METRICS.map(m=>{const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel telemetry-panel" key={m.sensor}><div className="panel-title"><span><Icon size={17}/>{m.title}</span><span className="panel-tag">{sensorStatusText(data.sensors?.[m.sensor])} · {m.unit}</span></div><div className="telemetry-number">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><Sparkline height={175} values={readings.map(r=>r.value)} color={m.color}/><p>Historical readings · {readings.length} recent samples · {readings[readings.length-1]?.source ?? "—"}</p></article>;})}</div>}
+        {view === "telemetry" && <div className="telemetry-grid">{METRICS.map(m=>{const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel telemetry-panel" key={m.sensor}><div className="panel-title"><span><Icon size={17}/>{m.title}</span><span className="panel-tag">{sensorStatusText(data.sensors?.[m.sensor], clock)} · {m.unit}</span></div><div className="telemetry-number">{formatValue(displayedSensorValue(m.sensor,data,clock))} <span>{m.unit}</span></div><Sparkline height={175} values={readings.map(r=>r.value)} color={m.color}/><p>Historical readings · {readings.length} recent samples · {readings[readings.length-1]?.source ?? "—"}</p></article>;})}</div>}
         {view === "alerts" && <section className="panel alerts-panel"><div className="panel-title"><span><Bell size={17}/> STATE TRANSITION HISTORY</span><span className="panel-tag">{data.alerts.length} EVENTS</span></div>{data.alerts.length ? <div className="alerts-table"><div className="alerts-header"><span>TRANSITION</span><span>DETAIL</span><span>SOURCE</span><span>TIME</span></div>{data.alerts.map((a,i)=><div className="alerts-line" key={String(a.timestamp_ms)+i}><span><AlertTriangle size={16}/> {a.previous_state} → {a.new_state}</span><span>{a.message}</span><span>{a.source || "UNKNOWN"}</span><time>{new Date(a.timestamp_ms).toLocaleString()}</time></div>)}</div>:<div className="empty-large"><CheckCircle2 size={34}/><h3>No transitions recorded</h3><p>Connect verified sensors or run the simulator to generate condition history.</p></div>}</section>}
         <footer className="footer">EDGE AI DIGITAL TWIN <span>·</span> MOTOR_01 <span>·</span> LOCAL READ-ONLY DASHBOARD <span>·</span> REAL SENSOR ACCURACY NOT YET VALIDATED</footer>
       </div>
