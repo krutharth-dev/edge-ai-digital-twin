@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({executablePath: process.env.CHROME_BIN});
 try {
   const page = await browser.newPage();
+  page.setDefaultTimeout(12000);
+  page.on("pageerror", err => console.error(err));
   const stamp = Date.now() - 60000; // Windows and Mac clocks need not agree.
   const readings = {temperature: 22.875, current: 0.123456, rpm: 118.375, vibration: 0.00004127};
   const frame = {
@@ -22,7 +24,10 @@ try {
     await page.waitForFunction(wanted => {
       const actual = [...document.querySelectorAll(".metric-card .metric-value")].map(e => e.textContent.trim());
       return JSON.stringify(actual) === JSON.stringify(wanted);
-    }, expected);
+    }, expected).catch(async error => {
+      console.error("Expected", expected, "rendered", await values.allTextContents());
+      throw error;
+    });
     assert.deepEqual((await values.allTextContents()).map(s => s.trim()), expected);
   }
   await verify(["22.875 °C", "0.123456 A", "118.375 RPM", "0.00004127 g"]);
