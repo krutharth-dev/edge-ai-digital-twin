@@ -53,7 +53,7 @@ function Sparkline({ values, color, height = 58 }: { values: number[]; color: st
 }
 function formatValue(value: number | undefined, sensor: Sensor) {
   if (value === undefined || value === null) return "—";
-  return sensor === "rpm" ? value.toFixed(0) : sensor === "current" || sensor === "vibration" ? value.toFixed(3) : value.toFixed(1);
+  return sensor === "rpm" ? value.toFixed(0) : sensor === "temperature" ? String(value) : value.toFixed(3);
 }
 function timeLabel(ms: number | null) {
   if (!ms) return "No telemetry yet";
