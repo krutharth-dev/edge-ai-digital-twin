@@ -30,6 +30,10 @@ void setup() {
   Serial.println("\n=== ADXL345 independent sensor test ===");
   Wire.begin(SDA_PIN, SCL_PIN);
   Wire.setClock(100000);
+  Serial.println("Scanning I2C for responding devices:");
+  for (uint8_t candidate = 8; candidate < 0x78; ++candidate) {
+    if (responds(candidate)) Serial.printf("  0x%02X\n", candidate);
+  }
   uint8_t address = 0;
   if (responds(0x53)) address = 0x53;
   else if (responds(0x1D)) address = 0x1D;
