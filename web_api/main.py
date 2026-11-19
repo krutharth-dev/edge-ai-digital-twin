@@ -99,7 +99,7 @@ def latest_snapshot(now: int) -> dict:
 def measurements() -> list[dict]:
     rows = select_rows(
         """SELECT timestamp_ms, topic, quality, source, payload_json
-        FROM sensor_readings ORDER BY id DESC LIMIT 480"""
+        FROM sensor_readings WHERE source = 'PHYSICAL' ORDER BY id DESC LIMIT 480"""
     )
     output = []
     for row in reversed(rows):
@@ -117,7 +117,7 @@ def measurements() -> list[dict]:
             output.append({
                 "time_ms": row["timestamp_ms"],
                 "sensor": sensor,
-                "value": round(float(value), 5),
+                "value": float(value),
                 "source": row["source"] or "PHYSICAL",
             })
         except (KeyError, ValueError, TypeError, json.JSONDecodeError):
@@ -143,7 +143,7 @@ def individual_sensors(now: int) -> dict:
         """SELECT s.topic, s.timestamp_ms, s.quality, s.source, s.payload_json
         FROM sensor_readings AS s
         JOIN (SELECT topic, MAX(id) AS newest_id
-              FROM sensor_readings GROUP BY topic) AS last
+              FROM sensor_readings WHERE source = 'PHYSICAL' GROUP BY topic) AS last
         ON s.id = last.newest_id"""
     )
     for row in rows:
@@ -152,10 +152,15 @@ def individual_sensors(now: int) -> dict:
             continue
         ts = row["timestamp_ms"]
         fresh = type(ts) is int and 0 <= now - ts <= FRESHNESS_MS
+        try:
+            payload = json.loads(row["payload_json"])
+            if not isinstance(payload, dict):
+                continue
+        except (ValueError, TypeError):
+            continue
         value = None
         if fresh and row["quality"] == "VALID":
             try:
-                payload = json.loads(row["payload_json"])
                 numeric = (
                     vibration_features(payload)["vibration_rms_g"]
                     if sensor == "vibration" else payload["value"]
@@ -169,6 +174,9 @@ def individual_sensors(now: int) -> dict:
             "value": value,
             "source": row["source"] or "UNKNOWN",
             "last_updated_ms": ts,
+            "sequence": payload.get("sequence"),
+            "boot_id": payload.get("boot_id"),
+            "diagnostics": {key: payload[key] for key in ("adc_voltage_v", "pulse_count", "total_pulses", "measurement_interval_ms", "sensor_status") if key in payload},
         }
     return output
 
@@ -187,6 +195,16 @@ def dashboard_data() -> dict:
         "history": measurements(),
         "alerts": alerts,
     }
+
+
+@app.get("/api/physical/latest")
+def latest_physical() -> dict:
+    return individual_sensors(now_ms())
+
+
+@app.get("/api/physical/history")
+def physical_history() -> list[dict]:
+    return measurements()
 
 
 @app.get("/api/health")
