@@ -25,7 +25,7 @@ int main() {
     assert(windowRpm(0, 1040, 2) == 0);
     assert(windowRpm(5, 1250, 2) == 120);
 }
-""".replace('#include <cassert>', '#include <cassert>\\n#include <initializer_list>'))
+""")
     executable = tmp_path / "calibration"
     subprocess.run([compiler, "-std=c++11", "-I", include, source, "-o", executable], check=True)
     subprocess.run([executable], check=True)
