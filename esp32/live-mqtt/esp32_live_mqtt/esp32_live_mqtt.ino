@@ -26,6 +26,7 @@
 #include <Adafruit_ADXL345_U.h>
 #include <math.h>
 #include <time.h>
+#include <esp_system.h>
 #include "secrets.h"
 
 constexpr int PIN_ONEWIRE = 4;
@@ -93,7 +94,7 @@ void setEnvelope(JsonDocument &doc, const char *quality) {
 
 void publish(const char *topic, JsonDocument &doc, bool retain = false) {
   if (!mqtt.connected()) return;
-  char buffer[8192];
+  static char buffer[8192];
   size_t length = measureJson(doc);
   if (length == 0 || length + 1 > sizeof(buffer)) {
     Serial.printf("ERROR: MQTT JSON payload too large for %s\n", topic);
@@ -101,7 +102,7 @@ void publish(const char *topic, JsonDocument &doc, bool retain = false) {
   }
   serializeJson(doc, buffer, sizeof(buffer));
   if (mqtt.publish(topic, buffer, retain)) {
-    Serial.printf("TX %s: %u bytes\n", topic, (unsigned)length);
+    Serial.printf("TX %s %s\n", topic, buffer);
   } else {
     Serial.printf("ERROR: MQTT publish failed: %s\n", topic);
   }
@@ -155,7 +156,7 @@ void setup() {
   delay(900);
   Serial.println("\n=== MOTOR_01 ESP32 -> React live integration ===");
   Serial.println("Motor control is DISABLED by design.");
-  bootId = String((uint32_t)ESP.getEfuseMac(), HEX) + "-" + String(millis());
+  bootId = String((uint32_t)ESP.getEfuseMac(), HEX) + "-" + String(esp_random(), HEX);
 
   Wire.begin(I2C_SDA, I2C_SCL);
   // Boards can strap ADXL345 ADDR/SDO to either supported I2C address.
@@ -214,6 +215,7 @@ void loop() {
   const bool currentValid = ACS_CALIBRATED && adcSafe && ACS_VOLTS_PER_AMP > 0;
   JsonDocument current;
   setEnvelope(current, currentValid ? "VALID" : "CALIBRATION_REQUIRED");
+  current["adc_voltage_v"] = adcV;
   current["unit"] = "A";
   if (currentValid) {
     const float sensorV = adcV * DIVIDER_GAIN;
@@ -231,6 +233,8 @@ void loop() {
   const bool hallValid = HALL_TESTED_AND_PPR_VERIFIED && HALL_PULSES_PER_REV > 0;
   JsonDocument speed;
   setEnvelope(speed, hallValid ? "VALID" : "CALIBRATION_REQUIRED");
+  speed["pulse_count"] = newEdges;
+  speed["total_pulses"] = edges;
   speed["unit"] = "rpm";
   speed["measurement_interval_ms"] = elapsedMs;
   if (hallValid) speed["value"] = 60000.0f * newEdges / (elapsedMs * HALL_PULSES_PER_REV);
@@ -239,6 +243,7 @@ void loop() {
 
   JsonDocument vibration;
   setEnvelope(vibration, adxlReady ? "VALID" : "INVALID");
+  if (!adxlReady) vibration["sensor_status"] = "SENSOR_DISCONNECTED";
   vibration["unit"] = "g";
   JsonArray x = vibration["x"].to<JsonArray>();
   JsonArray y = vibration["y"].to<JsonArray>();
