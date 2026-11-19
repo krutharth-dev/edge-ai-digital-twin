@@ -120,7 +120,7 @@ The sketch does **not** drive a motor. It requires reachable **NTP time** and wi
 
 ## 4. Start the demo on the Mac
 
-After installing the documented broker configuration, Python environment and frontend dependencies, run `./start_mvp.sh` from the repository. Stop any manually launched receiver first. The launcher prompts for the MQTT password and stays in the foreground. Open http://127.0.0.1:5173. Use Ctrl-C or `./stop_mvp.sh` to stop the managed services, and `./status_mvp.sh` to list the processes. Logs are under ~/.local/state/edge-ai-twin. A pre-existing broker stays running.
+After installing the documented broker configuration, Python environment and frontend dependencies, run `./start_mvp.sh` from the repository. Stop any manually launched receiver first. The launcher prompts for the MQTT password and stays in the foreground. Open http://127.0.0.1:5173. Use Ctrl-C or `./stop_mvp.sh` to stop the managed services, and `./status_mvp.sh` to list the processes. The launcher uses data/physical_mvp.db and accepts PHYSICAL sensor messages only. Previously recorded data stays in its original database. Logs are under ~/.local/state/edge-ai-twin. A pre-existing broker stays running.
 
 On Windows, if your Mac already allows SSH from the trusted hotspot, run `ssh -N -L 5173:127.0.0.1:5173 MAC_USER@MAC_LAN_IP` and open http://127.0.0.1:5173 there too. Both browsers then use the same Mac API and database.
 

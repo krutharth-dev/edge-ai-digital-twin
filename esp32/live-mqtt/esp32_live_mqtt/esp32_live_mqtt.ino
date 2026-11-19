@@ -62,6 +62,20 @@ uint32_t lastWifiAttemptMs = 0;
 uint32_t lastMqttAttemptMs = 0;
 uint32_t lastClockNoticeMs = 0;
 uint32_t sequence = 0;
+uint8_t adxlAddress = 0;
+bool findAccelerometer() {
+  for (uint8_t address : {0x53, 0x1D}) {
+    Wire.beginTransmission(address);
+    Wire.write((uint8_t)0x00);
+    if (Wire.endTransmission(false) != 0) continue;
+    if (Wire.requestFrom(address, (uint8_t)1) != 1 || Wire.read() != 0xE5) continue;
+    if (address != adxlAddress && !adxl.begin(address)) continue;
+    adxlAddress = address;
+    return true;
+  }
+  adxlAddress = 0;
+  return false;
+}
 bool adxlReady = false;
 bool dsReady = false;
 String bootId;
@@ -89,6 +103,7 @@ void setEnvelope(JsonDocument &doc, const char *quality) {
   doc["asset_id"] = "MOTOR_01";
   doc["timestamp_ms"] = timestampMs();
   doc["sequence"] = sequence;
+  doc["firmware_version"] = "esp32-react-live-v2";
   doc["run_id"] = nullptr;
   doc["boot_id"] = bootId;
   doc["source"] = "PHYSICAL";
@@ -115,7 +130,7 @@ void publishDeviceStatus() {
   JsonDocument status;
   setEnvelope(status, "VALID");
   status["status"] = "online";
-  status["firmware_version"] = "esp32-react-live-v1";
+  status["firmware_version"] = "esp32-react-live-v2";
   status["sensors"]["adxl345_detected"] = adxlReady;
   status["sensors"]["ds18b20_detected"] = dsReady;
   status["sensors"]["acs712_calibrated"] = ACS_CALIBRATED;
@@ -163,7 +178,7 @@ void setup() {
 
   Wire.begin(I2C_SDA, I2C_SCL);
   // Boards can strap ADXL345 ADDR/SDO to either supported I2C address.
-  adxlReady = adxl.begin(0x53) || adxl.begin(0x1D);
+  adxlReady = findAccelerometer();
   if (adxlReady) adxl.setRange(ADXL345_RANGE_2_G);
   ds18.begin();
   ds18.setWaitForConversion(false);
@@ -206,11 +221,13 @@ void loop() {
   ++sequence;
 
   const float tempC = ds18.getTempCByIndex(0);
+  dsReady = tempC != DEVICE_DISCONNECTED_C;
   ds18.requestTemperatures();
   const bool tempValid = dsReady && isfinite(tempC) &&
     tempC >= -40.0f && tempC <= 125.0f && tempC != DEVICE_DISCONNECTED_C;
   JsonDocument temperature;
   setEnvelope(temperature, tempValid ? "VALID" : "INVALID");
+  if (!dsReady) temperature["sensor_status"] = "SENSOR_DISCONNECTED";
   temperature["unit"] = "degC";
   if (tempValid) temperature["value"] = tempC;
   else temperature["value"] = nullptr;
@@ -247,6 +264,7 @@ void loop() {
   else speed["value"] = nullptr;
   publish("motor01/rpm", speed);
 
+  adxlReady = findAccelerometer();
   JsonDocument vibration;
   setEnvelope(vibration, adxlReady ? "VALID" : "INVALID");
   if (!adxlReady) vibration["sensor_status"] = "SENSOR_DISCONNECTED";

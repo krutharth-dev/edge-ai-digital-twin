@@ -105,6 +105,8 @@ class LiveService:
             return
         try:
             payload = json.loads(message.payload.decode("utf-8"))
+            if os.getenv("EDGE_AI_PHYSICAL_ONLY") == "1" and isinstance(payload, dict) and payload.get("source") != "PHYSICAL":
+                return
             snapshot = self.process(message.topic, payload)
         except (ValueError, TypeError, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             print(f"Rejected {message.topic}: {exc}", flush=True)
@@ -112,7 +114,7 @@ class LiveService:
         print(f"{message.topic}: {snapshot['health_state']} / {snapshot['message']}", flush=True)
 
     def run(self):
-        self.client.connect(self.broker, self.port, keepalive=60)
+        self.client.connect_async(self.broker, self.port, keepalive=60)
         self.client.loop_start()
         last_state = self.twin.health_state
         try:
