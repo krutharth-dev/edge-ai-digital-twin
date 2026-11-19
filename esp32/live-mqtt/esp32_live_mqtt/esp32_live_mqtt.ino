@@ -151,9 +151,8 @@ void ensureNetwork() {
   if (!timeReady()) {
     if (now - lastClockNoticeMs >= 5000) {
       lastClockNoticeMs = now;
-      Serial.println("Waiting for NTP clock; accurate time is REQUIRED for the Digital Twin");
+      Serial.println("Waiting for NTP; sensor packets need a synchronized clock");
     }
-    return;
   }
   if (mqtt.connected()) return;
   if (now - lastMqttAttemptMs < 5000) return;
@@ -182,7 +181,6 @@ void setup() {
   if (adxlReady) adxl.setRange(ADXL345_RANGE_2_G);
   ds18.begin();
   ds18.setWaitForConversion(false);
-  ds18.requestTemperatures();
   dsReady = ds18.getDeviceCount() > 0;
   Serial.printf("ADXL345: %s | DS18B20: %s\n",
                 adxlReady ? "DETECTED" : "MISSING",
@@ -195,8 +193,9 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  configTime(0, 0, "pool.ntp.org");
+  configTime(0, 0, "pool.ntp.org", "time.google.com", "time.cloudflare.com");
   mqtt.setServer(MQTT_HOST, MQTT_PORT);
+  mqtt.setSocketTimeout(2);
   if (!mqtt.setBufferSize(8192)) Serial.println("WARNING: cannot allocate MQTT buffer");
   Serial.printf("MQTT target: %s:%u\n", MQTT_HOST, (unsigned)MQTT_PORT);
   Serial.println("Current and RPM are CALIBRATION_REQUIRED until explicitly verified.");
@@ -220,18 +219,8 @@ void loop() {
   previousCycleMs = now;
   ++sequence;
 
-  const float tempC = ds18.getTempCByIndex(0);
-  dsReady = tempC != DEVICE_DISCONNECTED_C;
   ds18.requestTemperatures();
-  const bool tempValid = dsReady && isfinite(tempC) &&
-    tempC >= -40.0f && tempC <= 125.0f && tempC != DEVICE_DISCONNECTED_C;
-  JsonDocument temperature;
-  setEnvelope(temperature, tempValid ? "VALID" : "INVALID");
-  if (!dsReady) temperature["sensor_status"] = "SENSOR_DISCONNECTED";
-  temperature["unit"] = "degC";
-  if (tempValid) temperature["value"] = tempC;
-  else temperature["value"] = nullptr;
-  publish("motor01/temperature", temperature);
+  const uint32_t conversionStarted = millis();
 
   const float adcV = ACS_INTERFACE_VERIFIED ? analogReadMilliVolts(PIN_ADC) / 1000.0f : NAN;
   const bool adcSafe = isfinite(adcV) && adcV > 0.05f && adcV < 3.05f;
@@ -288,5 +277,21 @@ void loop() {
   vibration["sample_rate_hz"] = adxlReady && durationUs > 0
     ? (50.0f * 1000000.0f / durationUs) : 0.0f;
   publish("motor01/vibration", vibration);
+  while (millis() - conversionStarted < 750) {
+    mqtt.loop();
+    delay(5);
+  }
+  const float tempC = ds18.getTempCByIndex(0);
+  dsReady = tempC != DEVICE_DISCONNECTED_C;
+  const bool tempValid = dsReady && isfinite(tempC) &&
+    tempC >= -40.0f && tempC <= 125.0f && tempC != DEVICE_DISCONNECTED_C;
+  JsonDocument temperature;
+  setEnvelope(temperature, tempValid ? "VALID" : "INVALID");
+  if (!dsReady) temperature["sensor_status"] = "SENSOR_DISCONNECTED";
+  temperature["unit"] = "degC";
+  if (tempValid) temperature["value"] = tempC;
+  else temperature["value"] = nullptr;
+  publish("motor01/temperature", temperature);
+
   mqtt.loop();
 }
