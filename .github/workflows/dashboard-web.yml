@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
+      - 'scripts/mvp.py'
+      - '*_mvp.sh'
       - 'web_api/**'
       - 'tests/**'
       - '.github/workflows/dashboard-web.yml'
@@ -12,6 +14,8 @@ on:
     branches: [main]
     paths:
       - 'frontend/**'
+      - 'scripts/mvp.py'
+      - '*_mvp.sh'
       - 'web_api/**'
       - 'tests/**'
       - '.github/workflows/dashboard-web.yml'
@@ -41,3 +45,54 @@ jobs:
           node-version: '22'
       - run: npm install --no-audit --no-fund
       - run: npm run build
+
+  mac-launcher:
+    runs-on: macos-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          brew install mosquitto
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements-dev.txt
+          npm --prefix frontend install --no-audit --no-fund
+      - name: Verify supervised startup, authenticated MQTT and shutdown
+        shell: bash
+        run: |
+          set -eu
+          export MQTT_PASSWORD="$(openssl rand -hex 20)"
+          echo "::add-mask::$MQTT_PASSWORD"
+          export PATH="$(brew --prefix mosquitto)/sbin:$(brew --prefix mosquitto)/bin:$PATH"
+          config="$HOME/.config/edge-ai"
+          mkdir -p "$config"
+          mosquitto_passwd -b -c "$config/passwords" motor01 "$MQTT_PASSWORD"
+          printf 'listener 1884 127.0.0.1\nallow_anonymous false\npassword_file %s/passwords\n' "$config" > "$config/mosquitto-lan.conf"
+          ./start_mvp.sh > "$RUNNER_TEMP/launcher.log" 2>&1 &
+          launcher=$!
+          trap 'kill "$launcher" 2>/dev/null || true' EXIT
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/api/health; then break; fi
+            if ! kill -0 "$launcher"; then cat "$RUNNER_TEMP/launcher.log"; exit 1; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:5173/api/dashboard
+          ./status_mvp.sh
+          .venv/bin/python - <<'PY'
+          import json, time, urllib.request
+          for _ in range(15):
+              with urllib.request.urlopen("http://127.0.0.1:5173/api/dashboard") as response:
+                  if json.load(response)["mqtt_status"] == "CONNECTED":
+                      break
+              time.sleep(1)
+          else:
+              raise RuntimeError("Receiver did not authenticate with the broker")
+          PY
+          ./stop_mvp.sh
+          wait "$launcher"
+          if curl -fsS http://127.0.0.1:5173/api/health; then exit 1; fi
