@@ -28,6 +28,7 @@
 #include <time.h>
 #include <esp_system.h>
 #include "secrets.h"
+#include "measurement_math.h"
 
 constexpr int PIN_ONEWIRE = 4;
 constexpr int PIN_ADC = 35;
@@ -224,14 +225,13 @@ void loop() {
 
   const float adcV = ACS_INTERFACE_VERIFIED ? analogReadMilliVolts(PIN_ADC) / 1000.0f : NAN;
   const bool adcSafe = isfinite(adcV) && adcV > 0.05f && adcV < 3.05f;
-  const bool currentValid = ACS_CALIBRATED && adcSafe && ACS_VOLTS_PER_AMP > 0;
+  const bool currentValid = ACS_CALIBRATED && adcSafe && ACS_VOLTS_PER_AMP > 0 && DIVIDER_GAIN > 0;
   JsonDocument current;
   setEnvelope(current, currentValid ? "VALID" : "CALIBRATION_REQUIRED");
   if (isfinite(adcV)) current["adc_voltage_v"] = adcV;
   current["unit"] = "A";
   if (currentValid) {
-    const float sensorV = adcV * DIVIDER_GAIN;
-    current["value"] = fabsf(sensorV - ACS_ZERO_VOLTS) / ACS_VOLTS_PER_AMP;
+    current["value"] = currentMagnitude(adcV, DIVIDER_GAIN, ACS_ZERO_VOLTS, ACS_VOLTS_PER_AMP);
   } else {
     current["value"] = nullptr;
   }
@@ -249,7 +249,7 @@ void loop() {
   speed["total_pulses"] = edges;
   speed["unit"] = "rpm";
   speed["measurement_interval_ms"] = elapsedMs;
-  if (hallValid) speed["value"] = 60000.0f * newEdges / (elapsedMs * HALL_PULSES_PER_REV);
+  if (hallValid) speed["value"] = windowRpm(newEdges, elapsedMs, HALL_PULSES_PER_REV);
   else speed["value"] = nullptr;
   publish("motor01/rpm", speed);
 
