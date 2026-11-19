@@ -15,7 +15,7 @@ type Snapshot = {
   model_version?: string | null; model_data_type?: string | null;
 };
 type Reading = { time_ms: number; sensor: Sensor; value: number; source: string };
-type SensorDiagnostic = { quality: string; is_fresh: boolean; value: number | null; source: string | null; last_updated_ms: number | null };
+type SensorDiagnostic = { sequence?: number; boot_id?: string; diagnostics?: {adc_voltage_v?: number; pulse_count?: number; measurement_interval_ms?: number; sensor_status?: string}; quality: string; is_fresh: boolean; value: number | null; source: string | null; last_updated_ms: number | null };
 type Alert = { timestamp_ms: number; previous_state: string; new_state: string; message: string; source: string | null };
 type Dashboard = { server_time_ms: number; asset_id: string; snapshot: Snapshot; sensors?: Partial<Record<Sensor, SensorDiagnostic>>; history: Reading[]; alerts: Alert[] };
 type View = "overview" | "telemetry" | "alerts";
@@ -60,10 +60,19 @@ function timeLabel(ms: number | null) {
   return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
+function SensorDetails({sensor}: {sensor?: SensorDiagnostic}) {
+  if (!sensor?.last_updated_ms) return null;
+  const d = sensor.diagnostics;
+  return <div><small>Sample {sensor.sequence ?? "—"} · {new Date(sensor.last_updated_ms).toISOString().slice(11,23)} UTC</small>
+    {d?.adc_voltage_v != null && <p>ADC {d.adc_voltage_v} V</p>}
+    {d?.pulse_count != null && <p>{d.pulse_count} pulses in {d.measurement_interval_ms} ms</p>}
+  </div>;
+}
 function sensorStatusText(sensor?: SensorDiagnostic) {
   if (!sensor || sensor.quality === "MISSING") return "MISSING";
   const age = Date.now() - (sensor.last_updated_ms ?? 0);
   if (!sensor.is_fresh || age < 0 || age > 12_000) return "STALE / OFFLINE";
+  if (sensor.diagnostics?.sensor_status === "SENSOR_DISCONNECTED") return "DISCONNECTED";
   return sensor.quality + " / " + (sensor.source ?? "UNKNOWN");
 }
 function displayedSensorValue(sensorName: Sensor, metric: keyof Snapshot["metrics"], data: Dashboard, snapshot: Snapshot) {
@@ -175,7 +184,7 @@ export default function App() {
             </section>
           </div>
           <div className="section-header"><h2>Live Sensor Readings</h2><span>Four monitored parameters <ArrowUpRight size={15}/></span></div>
-          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">{sensorStatusText(data.sensors?.[m.sensor])}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
+          <div className="metrics-grid">{METRICS.map(m => {const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel metric-card" key={m.sensor}><div className="metric-top"><div className="metric-icon" style={{color:m.color,background:m.color+"18"}}><Icon size={20}/></div><span className="metric-tag">{sensorStatusText(data.sensors?.[m.sensor])}</span></div><div className="metric-name">{m.title}</div><div className="metric-value">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><SensorDetails sensor={data.sensors?.[m.sensor]}/><Sparkline values={readings.map(r=>r.value)} color={m.color}/><div className="metric-bottom"><span>{readings.length} recent samples</span><span>HISTORY <ArrowUpRight size={13}/></span></div></article>;})}</div>
           <div className="bottom-grid"><section className="panel detail-panel"><div className="panel-title"><span><Cpu size={17}/> AI INFERENCE</span><span className="panel-tag">OPTIONAL MODEL</span></div><div className="ai-inference">{snapshot.predicted_state ? <><div className="ai-value">{snapshot.predicted_state}</div><p>Classifier probability: {snapshot.confidence == null ? "Not available" : (snapshot.confidence*100).toFixed(1)+"%"} · Not calibrated</p><small>{snapshot.model_version ?? "Unversioned"} · {snapshot.model_data_type ?? "Unverified data"}</small></> : <><div className="ai-placeholder"><Cpu size={30}/></div><h3>Rule-based monitoring active</h3><p>No optional ML inference loaded. Run the trusted local demo model to see predictions.</p></>}</div></section><section className="panel detail-panel"><div className="panel-title"><span><Bell size={17}/> RECENT EVENTS</span><button className="text-action" onClick={()=>setView("alerts")}>View all <ArrowUpRight size={14}/></button></div><div className="events-list">{data.alerts.length===0?<p className="empty-state">No state-transition alerts recorded yet.</p>:data.alerts.slice(0,3).map((a,i)=><div className="event-row" key={String(a.timestamp_ms)+i}><span className="event-icon"><AlertTriangle size={17}/></span><div><strong>{a.previous_state} → {a.new_state}</strong><p>{a.message}</p></div><time>{timeLabel(a.timestamp_ms)}</time></div>)}</div></section></div>
         </>}
         {view === "telemetry" && <div className="telemetry-grid">{METRICS.map(m=>{const Icon=m.icon;const readings=recent[m.sensor];return <article className="panel telemetry-panel" key={m.sensor}><div className="panel-title"><span><Icon size={17}/>{m.title}</span><span className="panel-tag">{sensorStatusText(data.sensors?.[m.sensor])} · {m.unit}</span></div><div className="telemetry-number">{formatValue(displayedSensorValue(m.sensor,m.key,data,snapshot),m.sensor)} <span>{m.unit}</span></div><Sparkline height={175} values={readings.map(r=>r.value)} color={m.color}/><p>Historical readings · {readings.length} recent samples · {readings[readings.length-1]?.source ?? "—"}</p></article>;})}</div>}

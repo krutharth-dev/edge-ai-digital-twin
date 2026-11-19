@@ -6,3 +6,6 @@
 #define MQTT_PORT 1884
 #define MQTT_USERNAME "motor01"
 #define MQTT_PASSWORD "YOUR_PRIVATE_MQTT_PASSWORD"
+
+// Enable only after measuring and verifying the conditioned ADC interface.
+#define ACS_INTERFACE_VERIFIED false

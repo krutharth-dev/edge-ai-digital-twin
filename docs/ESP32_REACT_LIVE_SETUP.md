@@ -118,7 +118,15 @@ The sketch does **not** drive a motor. It requires reachable **NTP time** and wi
 
 **IMPORTANT:** the integrated firmware deliberately starts with ACS_CALIBRATED=false and HALL_TESTED_AND_PPR_VERIFIED=false. Until verified, those topics send **CALIBRATION_REQUIRED**, and motor health correctly stays **UNKNOWN**. Do not flip these flags merely to make the screen green. Calibrate ACS712 zero/sensitivity/divider with an external meter and verify Hall pulse count before setting the flags true.
 
-## 4. Mac: start the three processes for React
+## 4. Start the demo on the Mac
+
+After installing the documented broker configuration, Python environment and frontend dependencies, run `./start_mvp.sh` from the repository. Stop any manually launched receiver first. The launcher prompts for the MQTT password and stays in the foreground. Open http://127.0.0.1:5173. Use Ctrl-C or `./stop_mvp.sh` to stop the managed services, and `./status_mvp.sh` to list the processes. Logs are under ~/.local/state/edge-ai-twin. A pre-existing broker stays running.
+
+On Windows, if your Mac already allows SSH from the trusted hotspot, run `ssh -N -L 5173:127.0.0.1:5173 MAC_USER@MAC_LAN_IP` and open http://127.0.0.1:5173 there too. Both browsers then use the same Mac API and database.
+
+With the motor power isolated, compare a Serial TX temperature record with /api/physical/latest and the temperature card. Match sequence, timestamp and value. After unplugging the ESP32 wait 13 seconds and check that the live number disappears. When the board reconnects, check that the boot ID changes and fresh samples appear. To collect raw ADC diagnostics after electrical verification, enable ACS_INTERFACE_VERIFIED in secrets.h. Leave ACS_CALIBRATED false until offset, divider ratio and sensitivity are measured.
+
+### Manual startup for troubleshooting
 
 Leave broker Terminal 1 running. Open three more terminal windows in the SAME repository.
 
@@ -154,7 +162,7 @@ Open **http://127.0.0.1:5173** on your **MAC**. This is the React application, n
 
 ## 5. Interpret readings and run checks
 
-The updated React cards can show individual **VALID / PHYSICAL**, **CALIBRATION_REQUIRED / PHYSICAL**, **MISSING**, and **STALE / OFFLINE** states even if the overall twin is **UNKNOWN**. Fresh individual valid sensor values are displayed independently, but UNKNOWN stays UNKNOWN until all four sensors are valid and consistent. Old SIMULATED rows might remain in history; never present them as physical measurements. Health thresholds, predictions and scores are academic demonstrations, **not** machine protection.
+The updated React cards can show individual **VALID / PHYSICAL**, **CALIBRATION_REQUIRED / PHYSICAL**, **MISSING**, and **STALE / OFFLINE** states even if the overall twin is **UNKNOWN**. Fresh individual valid sensor values are displayed independently, but UNKNOWN stays UNKNOWN until all four sensors are valid and consistent. The physical history endpoint excludes SIMULATED rows. Health thresholds, predictions and scores are academic demonstrations, **not** machine protection.
 
 Optional software-only checks on the Mac:
 

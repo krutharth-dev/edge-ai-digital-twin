@@ -36,6 +36,9 @@ constexpr int I2C_SDA = 21;
 constexpr int I2C_SCL = 22;
 
 // Do not set these flags true until bench verification/calibration is complete.
+#ifndef ACS_INTERFACE_VERIFIED
+#define ACS_INTERFACE_VERIFIED false
+#endif
 constexpr bool ACS_CALIBRATED = false;
 constexpr bool HALL_TESTED_AND_PPR_VERIFIED = false;
 
@@ -163,6 +166,8 @@ void setup() {
   adxlReady = adxl.begin(0x53) || adxl.begin(0x1D);
   if (adxlReady) adxl.setRange(ADXL345_RANGE_2_G);
   ds18.begin();
+  ds18.setWaitForConversion(false);
+  ds18.requestTemperatures();
   dsReady = ds18.getDeviceCount() > 0;
   Serial.printf("ADXL345: %s | DS18B20: %s\n",
                 adxlReady ? "DETECTED" : "MISSING",
@@ -196,11 +201,12 @@ void loop() {
     return;
   }
   const uint32_t elapsedMs = previousCycleMs == 0 ? 1000 : now - previousCycleMs;
+  const bool havePulseWindow = previousCycleMs != 0;
   previousCycleMs = now;
   ++sequence;
 
-  ds18.requestTemperatures();
   const float tempC = ds18.getTempCByIndex(0);
+  ds18.requestTemperatures();
   const bool tempValid = dsReady && isfinite(tempC) &&
     tempC >= -40.0f && tempC <= 125.0f && tempC != DEVICE_DISCONNECTED_C;
   JsonDocument temperature;
@@ -210,12 +216,12 @@ void loop() {
   else temperature["value"] = nullptr;
   publish("motor01/temperature", temperature);
 
-  const float adcV = analogReadMilliVolts(PIN_ADC) / 1000.0f;
+  const float adcV = ACS_INTERFACE_VERIFIED ? analogReadMilliVolts(PIN_ADC) / 1000.0f : NAN;
   const bool adcSafe = isfinite(adcV) && adcV > 0.05f && adcV < 3.05f;
   const bool currentValid = ACS_CALIBRATED && adcSafe && ACS_VOLTS_PER_AMP > 0;
   JsonDocument current;
   setEnvelope(current, currentValid ? "VALID" : "CALIBRATION_REQUIRED");
-  current["adc_voltage_v"] = adcV;
+  if (isfinite(adcV)) current["adc_voltage_v"] = adcV;
   current["unit"] = "A";
   if (currentValid) {
     const float sensorV = adcV * DIVIDER_GAIN;
@@ -230,7 +236,7 @@ void loop() {
   interrupts();
   const uint32_t newEdges = edges - previousEdges;
   previousEdges = edges;
-  const bool hallValid = HALL_TESTED_AND_PPR_VERIFIED && HALL_PULSES_PER_REV > 0;
+  const bool hallValid = havePulseWindow && HALL_TESTED_AND_PPR_VERIFIED && HALL_PULSES_PER_REV > 0;
   JsonDocument speed;
   setEnvelope(speed, hallValid ? "VALID" : "CALIBRATION_REQUIRED");
   speed["pulse_count"] = newEdges;
